@@ -1,0 +1,69 @@
+source VundlePlugins.vim
+syntax enable
+filetype plugin on
+set background=dark
+set t_Co=16
+colorscheme solarized
+
+let mapleader=","
+let g:easymotion_leader_key = '<leader>'
+let g:surround_100 = "do \r\n\nend" " surround letter d for do .. end
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#force_overwrite_completefunc = 1
+let g:neosnippet#snippets_directory = "bundle/neosnippet-snippets/neosnippets"
+let g:neocomplete#sources#syntax#min_keyword_length = 3
+let NERDTreeBookmarksFile = "~/.vim/NERDTreeBookmarks"
+let g:airline_right_sep = '◖'
+let g:airline_left_sep = '◗'
+let g:airline_symbols_branch = '⎇'
+
+imap <C-k> <Plug>(neosnippet_expand_or_jump)
+smap <C-k> <Plug>(neosnippet_expand_or_jump)
+xmap <C-k> <Plug>(neosnippet_expand_target)
+nnoremap <silent> <C-S> :update<CR>
+nnoremap <leader>m :NERDTreeToggle<CR>
+nnoremap <leader>t :Tagbar<CR>
+nnoremap <leader>ev :split /home/lompy/.vim/vimrc<CR>
+nnoremap <leader>sv :source /home/lompy/.vimrc<CR>
+nnoremap <C-s> :w<CR>
+nnoremap <leader>h :noh<CR>
+nnoremap <leader>l :set list!<CR>
+inoremap kj <Esc>
+inoremap jk <Esc>
+vnoremap <silent> <C-S> <C-C>:update<CR>
+inoremap <silent> <C-S> <C-O>:update<CR>
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#filters#sorter_default#use(['sorter_rank'])
+nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec<CR>
+nnoremap <leader>v :<C-u>Unite -start-insert -no-split buffer<CR>
+
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set scrolloff=4
+set number
+set autoindent
+set tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+set laststatus=2
+" Before airline:
+" set statusline=%<%f%y\ %h%m%r%{fugitive#statusline()}%=%-14.(%L:%4l,%c%V%)\ %P
+set fillchars+=vert:\ 
+set mouse=a
+set hlsearch
+set autowrite
+set undofile
+set undodir=/home/lompy/.vim/vimundo/
+set shellpipe=>
+hi Underlined cterm=bold ctermfg=5
+call togglebg#map("<F5>")
+
+function! <SID>StripTrailingWhitespaces()
+   " Preparation: save last search, and cursor position.
+   let _s=@/
+   let l = line(".")
+   let c = col(".")
+   " Do the business:
+   %s/\s\+$//e
+   " Clean up: restore previous search history, and cursor position
+   let @/=_s
+   call cursor(l, c)
+endfunction
+autocmd BufWritePre *.py,*.js,*.rb,*.rake,*.coffee,*.haml,*.yml :call <SID>StripTrailingWhitespaces()
