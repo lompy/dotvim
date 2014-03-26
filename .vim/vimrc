@@ -1,31 +1,418 @@
-source VundlePlugins.vim
-syntax enable
-filetype plugin on
-set background=dark
-set t_Co=16
-colorscheme solarized
+  " NeoBundle init {{{
+  if has('vim_starting')
+    set nocompatible
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
+  endif
+  call neobundle#rc(expand('~/.vim/bundle/'))
+  NeoBundleFetch 'Shougo/neobundle.vim'
 
-let mapleader=","
-let g:easymotion_leader_key = '<leader>'
-let g:surround_100 = "do \r\n\nend" " surround letter d for do .. end
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#force_overwrite_completefunc = 1
-let g:neosnippet#snippets_directory = "bundle/neosnippet-snippets/neosnippets"
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let NERDTreeBookmarksFile = "~/.vim/NERDTreeBookmarks"
-let g:airline_right_sep = '◖'
-let g:airline_left_sep = '◗'
-let g:airline_symbols_branch = '⎇'
+  " My list
+  NeoBundle 'Raimondi/delimitMate'
 
-imap <C-k> <Plug>(neosnippet_expand_or_jump)
-smap <C-k> <Plug>(neosnippet_expand_or_jump)
-xmap <C-k> <Plug>(neosnippet_expand_target)
+  NeoBundleCheck
+  " }}}
+
+  " functions {{{
+  function! Preserve(command) "{{{
+    " preparation: save last search, and cursor position.
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    " do the business:
+    execute a:command
+    " clean up: restore previous search history, and cursor position
+    let @/=_s
+    call cursor(l, c)
+  endfunction "}}}
+  function! StripTrailingWhitespace() "{{{
+    call Preserve("%s/\\s\\+$//e")
+  endfunction "}}}
+  function! EnsureExists(path) "{{{
+    if !isdirectory(expand(a:path))
+      call mkdir(expand(a:path))
+    endif
+  endfunction "}}}
+  function! CloseWindowOrKillBuffer() "{{{
+    let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+
+    " never bdelete a nerd tree
+    if matchstr(expand("%"), 'NERD') == 'NERD'
+      wincmd c
+      return
+    endif
+
+    if number_of_windows_to_this_buffer > 1
+      wincmd c
+    else
+      bdelete
+    endif
+  endfunction "}}}
+  "}}}
+
+  " base configuration {{{
+  set timeoutlen=300                                  "mapping timeout
+  set ttimeoutlen=50                                  "keycode timeout
+
+  set mouse=a                                         "enable mouse
+  set mousehide                                       "hide when characters are typed
+  set history=1000                                    "number of command lines to remember
+  set ttyfast                                         "assume fast terminal connection
+  set viewoptions=folds,options,cursor,unix,slash     "unix/windows compatibility
+  set encoding=utf-8                                  "set encoding for text
+  set hidden                                          "allow buffer switching without saving
+  set autoread                                        "auto reload if file saved externally
+  set fileformats+=mac                                "add mac to auto-detection of file format line endings
+  set nrformats-=octal                                "always assume decimal numbers
+  set showcmd
+  set showfulltag
+  set modeline
+  set modelines=5
+
+  " whitespace
+  set backspace=indent,eol,start                      "allow backspacing everything in insert mode
+  set autoindent                                      "automatically indent to match adjacent lines
+  set expandtab                                       "spaces instead of tabs
+  set smarttab                                        "use shiftwidth to enter tabs
+  let &tabstop=2                                       "number of spaces per tab for display
+  let &softtabstop=2                                   "number of spaces per tab in insert mode
+  let &shiftwidth=2                                    "number of spaces when indenting
+  set nolist                                            "highlight whitespace
+  set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
+  set shiftround
+  set linebreak
+  let &showbreak='↪ '
+  set scrolloff=1                                     "always show content after scroll
+  set scrolljump=5                                    "minimum number of lines to scroll
+  set display+=lastline
+
+  set splitbelow
+  set splitright
+
+  " disable sounds
+  set noerrorbells
+  set novisualbell
+  set t_vb=
+
+  " searching
+  set hlsearch                                        "highlight searches
+  set incsearch                                       "incremental searching
+  set ignorecase                                      "ignore case for searching
+  set smartcase                                       "do case-sensitive if there's a capital letter
+  if executable('ack-grep')
+    set grepprg=ack-grep\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+    set grepformat=%f:%l:%c:%m
+  endif
+  if executable('ag')
+    set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+    set grepformat=%f:%l:%c:%m
+  endif
+
+  " vim file/folder management {{{
+    " persistent undo
+    if exists('+undofile')
+      set undofile
+      set undodir=~/.vim/cache/undo
+    endif
+
+    " backups
+    set backup
+    set backupdir=~/.vim/cache/backup
+
+    " swap files
+    set directory=~/.vim/cache/swap
+    set noswapfile
+
+    call EnsureExists('~/.vim/cache')
+    call EnsureExists(&undodir)
+    call EnsureExists(&backupdir)
+    call EnsureExists(&directory)
+  "}}}
+
+  let mapleader = ","
+  let g:mapleader = ","
+"}}}
+
+" ui configuration {{{
+  set showmatch                                       "automatically highlight matching braces/brackets/etc.
+  set matchtime=2                                     "tens of a second to show matching parentheses
+  set number
+  set lazyredraw
+  set laststatus=2
+  set noshowmode
+  set foldenable                                      "enable folds by default
+  set foldmethod=syntax                               "fold via syntax of files
+  set foldlevelstart=99                               "open all folds by default
+  let g:xml_syntax_folding=1                          "enable xml folding
+
+  set cursorline
+  autocmd WinLeave * setlocal nocursorline
+  autocmd WinEnter * setlocal cursorline
+  let &colorcolumn=120
+
+  set fillchars+=vert:\                               "space instead of | as vertical delimiter
+
+  if has('conceal')
+    set conceallevel=1
+    set listchars+=conceal:Δ
+  endif
+"}}}
+
+" plugin/mapping configuration {{{
+  " core {{{
+    NeoBundle 'matchit.zip'
+    NeoBundle 'bling/vim-airline' "{{{
+      let g:airline_right_sep = '◖'
+      let g:airline_left_sep = '◗'
+      let g:airline_symbols_branch = '⎇'
+    "}}}
+    NeoBundle 'tpope/vim-surround' "{{{
+      let g:surround_100 = "do \r\n\nend" "surround letter d for do .. end
+    "}}}
+    NeoBundle 'tpope/vim-repeat'
+    NeoBundle 'tpope/vim-eunuch'
+    NeoBundle 'tpope/vim-unimpaired'
+    NeoBundle 'Shougo/vimproc.vim', {
+      \ 'build': {
+        \ 'mac': 'make -f make_mac.mak',
+        \ 'unix': 'make -f make_unix.mak',
+        \ 'cygwin': 'make -f make_cygwin.mak',
+        \ 'windows': '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\nmake.exe" make_msvc32.mak',
+      \ },
+    \ }
+  "}}}
+  
+  " web {{{
+    NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
+    NeoBundleLazy 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sass']}}
+    NeoBundleLazy 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
+    NeoBundleLazy 'ap/vim-css-color', {'autoload':{'filetypes':['css','scss','sass','less','styl']}}
+    NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
+    NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
+    NeoBundleLazy 'juvenn/mustache.vim', {'autoload':{'filetypes':['mustache']}}
+    NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
+    NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}} "{{{
+      function! s:zen_html_tab()
+        let line = getline('.')
+        if match(line, '<.*>') < 0
+          return "\<c-y>,"
+        endif
+        return "\<c-y>n"
+      endfunction
+      autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
+      autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
+  "}}}
+
+  " javascript {{{
+    NeoBundleLazy 'marijnh/tern_for_vim', {
+      \ 'autoload': { 'filetypes': ['javascript'] },
+      \ 'build': {
+        \ 'mac': 'npm install',
+        \ 'unix': 'npm install',
+        \ 'cygwin': 'npm install',
+        \ 'windows': 'npm install',
+      \ },
+    \ }
+    NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
+    NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}} "{{{
+      nnoremap <leader>fjs :call JsBeautify()<cr>
+    "}}}
+    NeoBundleLazy 'leafgarland/typescript-vim', {'autoload':{'filetypes':['typescript']}}
+    NeoBundleLazy 'kchmck/vim-coffee-script', {'autoload':{'filetypes':['coffee']}}
+    NeoBundleLazy 'mmalecki/vim-node.js', {'autoload':{'filetypes':['javascript']}}
+    NeoBundleLazy 'leshill/vim-json', {'autoload':{'filetypes':['javascript','json']}}
+    NeoBundleLazy 'othree/javascript-libraries-syntax.vim', {'autoload':{'filetypes':['javascript','coffee','ls','typescript']}}
+  "}}}
+  
+  " ruby {{{
+    NeoBundle 'vim-ruby/vim-ruby'
+    NeoBundle 'tpope/vim-rails'
+    NeoBundle 'tpope/vim-bundler'
+  "}}}
+  
+  " python {{{
+    NeoBundleLazy 'klen/python-mode', {'autoload':{'filetypes':['python']}} "{{{
+      let g:pymode_rope=0
+    "}}}
+    NeoBundleLazy 'davidhalter/jedi-vim', {'autoload':{'filetypes':['python']}} "{{{
+      let g:jedi#popup_on_dot=0
+    "}}}
+  "}}}
+  
+  " scm {{{
+    NeoBundle 'mhinz/vim-signify' "{{{
+      let g:signify_update_on_bufenter=0
+    "}}}
+    if executable('hg')
+      NeoBundle 'bitbucket:ludovicchabant/vim-lawrencium'
+    endif
+    NeoBundle 'tpope/vim-fugitive' "{{{
+      nnoremap <silent> <leader>gs :Gstatus<CR>
+      nnoremap <silent> <leader>gd :Gdiff<CR>
+      nnoremap <silent> <leader>gc :Gcommit<CR>
+      nnoremap <silent> <leader>gb :Gblame<CR>
+      nnoremap <silent> <leader>gl :Glog<CR>
+      nnoremap <silent> <leader>gp :Git push<CR>
+      nnoremap <silent> <leader>gw :Gwrite<CR>
+      nnoremap <silent> <leader>gr :Gremove<CR>
+      autocmd FileType gitcommit nmap <buffer> U :Git checkout -- <C-r><C-g><CR>
+      autocmd BufReadPost fugitive://* set bufhidden=delete
+    "}}}
+    NeoBundleLazy 'gregsexton/gitv', {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}} "{{{
+      nnoremap <silent> <leader>gv :Gitv<CR>
+      nnoremap <silent> <leader>gV :Gitv!<CR>
+    "}}}
+  "}}}
+
+  " autocomplete {{{
+    NeoBundle 'Shougo/neosnippet-snippets'
+    NeoBundle 'Shougo/neosnippet.vim' "{{{
+      let g:neosnippet#snippets_directory='~/.vim/snippets'
+      imap <C-k> <Plug>(neosnippet_expand_or_jump)
+      smap <C-k> <Plug>(neosnippet_expand_or_jump)
+      xmap <C-k> <Plug>(neosnippet_expand_target)
+    "}}}
+    NeoBundleLazy 'Shougo/neocomplete.vim', {'autoload':{'insert':1}, 'vim_version':'7.3.885'} "{{{
+      let g:neocomplete#enable_at_startup=1
+      let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
+      let g:neocomplete#force_overwrite_completefunc = 1
+      let g:neocomplete#sources#syntax#min_keyword_length = 3
+    "}}}
+  "}}}
+
+  " editing {{{
+    NeoBundleLazy 'editorconfig/editorconfig-vim', {'autoload':{'insert':1}}
+    NeoBundle 'tpope/vim-endwise'
+    NeoBundle 'tpope/vim-speeddating'
+    NeoBundle 'vim-scripts/tComment'
+    NeoBundle 'terryma/vim-expand-region'
+    " NeoBundle 'terryma/vim-multiple-cursors'
+    " NeoBundle 'chrisbra/NrrwRgn'
+    NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
+      nmap <Leader>a& :Tabularize /&<CR>
+      vmap <Leader>a& :Tabularize /&<CR>
+      nmap <Leader>a= :Tabularize /=<CR>
+      vmap <Leader>a= :Tabularize /=<CR>
+      nmap <Leader>a: :Tabularize /:<CR>
+      vmap <Leader>a: :Tabularize /:<CR>
+      nmap <Leader>a:: :Tabularize /:\zs<CR>
+      vmap <Leader>a:: :Tabularize /:\zs<CR>
+      nmap <Leader>a, :Tabularize /,<CR>
+      vmap <Leader>a, :Tabularize /,<CR>
+      nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+      vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+    "}}}
+    NeoBundle 'justinmk/vim-sneak' "{{{
+      let g:sneak#streak = 1
+    "}}}
+    NeoBundle 'Lokaltog/vim-easymotion' "{{{
+      let g:easymotion_leader_key = '<leader>'
+    "}}}
+  "}}}
+
+  " navigation {{{
+    NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
+      let NERDTreeShowHidden=1
+      let NERDTreeQuitOnOpen=0
+      let NERDTreeShowLineNumbers=1
+      let NERDTreeChDirMode=0
+      let NERDTreeShowBookmarks=1
+      let NERDTreeIgnore=['\.git','\.hg']
+      let NERDTreeBookmarksFile='~/.vim/cache/NERDTreeBookmarks'
+      nnoremap <Leader>m :NERDTreeToggle<CR>
+    "}}}
+    NeoBundleLazy 'majutsushi/tagbar', {'autoload':{'commands':'TagbarToggle'}} "{{{
+      nnoremap <silent> <F9> :TagbarToggle<CR>
+    "}}}
+  "}}}
+  
+  " unite {{{
+    NeoBundle 'Shougo/unite.vim' "{{{
+      let bundle = neobundle#get('unite.vim')
+      function! bundle.hooks.on_source(bundle)
+        call unite#filters#matcher_default#use(['matcher_fuzzy'])
+        call unite#filters#sorter_default#use(['sorter_rank'])
+        call unite#set_profile('files', 'smartcase', 1)
+        call unite#custom#source('line,outline','matchers','matcher_fuzzy')
+      endfunction
+
+      let g:unite_data_directory='~/.vim/cache/unite'
+      let g:unite_enable_start_insert=1
+      let g:unite_source_history_yank_enable=1
+      let g:unite_source_rec_max_cache_files=5000
+      let g:unite_prompt='» '
+
+      if executable('ack-grep')
+        let g:unite_source_grep_command='ack-grep'
+        let g:unite_source_grep_default_opts='--no-heading --no-color -C4'
+        let g:unite_source_grep_recursive_opt=''
+      endif
+
+      function! s:unite_settings()
+        nmap <buffer> Q <plug>(unite_exit)
+        nmap <buffer> <esc> <plug>(unite_exit)
+        imap <buffer> <esc> <plug>(unite_exit)
+      endfunction
+      autocmd FileType unite call s:unite_settings()
+
+      nmap <space> [unite]
+      nnoremap [unite] <nop>
+
+      nnoremap <silent> [unite]<space> :<C-u>Unite -toggle -auto-resize -buffer-name=mixed file_rec/async:! buffer file_mru bookmark<cr><c-u>
+      nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec/async:!<cr><c-u>
+      nnoremap <silent> [unite]e :<C-u>Unite -buffer-name=recent file_mru<cr>
+      nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks history/yank<cr>
+      nnoremap <silent> [unite]l :<C-u>Unite -auto-resize -buffer-name=line line<cr>
+      nnoremap <silent> [unite]b :<C-u>Unite -auto-resize -buffer-name=buffers buffer<cr>
+      nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
+      nnoremap <silent> [unite]m :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
+      nnoremap <silent> [unite]s :<C-u>Unite -quick-match buffer<cr>
+    "}}}
+    NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
+    NeoBundleLazy 'tsukkee/unite-tag', {'autoload':{'unite_sources':['tag','tag/file']}} "{{{
+      nnoremap <silent> [unite]t :<C-u>Unite -auto-resize -buffer-name=tag tag tag/file<cr>
+    "}}}
+    NeoBundleLazy 'Shougo/unite-outline', {'autoload':{'unite_sources':'outline'}} "{{{
+      nnoremap <silent> [unite]o :<C-u>Unite -auto-resize -buffer-name=outline outline<cr>
+    "}}}
+    NeoBundleLazy 'Shougo/unite-help', {'autoload':{'unite_sources':'help'}} "{{{
+      nnoremap <silent> [unite]h :<C-u>Unite -auto-resize -buffer-name=help help<cr>
+    "}}}
+  "}}}
+
+  " textobj {{{
+    NeoBundle 'kana/vim-textobj-user'
+    NeoBundle 'kana/vim-textobj-indent'
+    NeoBundle 'kana/vim-textobj-entire'
+    NeoBundle 'lucapette/vim-textobj-underscore'
+  "}}}
+
+  " misc {{{
+    NeoBundle 'henrik/vim-indexed-search'
+    NeoBundle 'nelstrom/vim-qargs'
+    NeoBundle 'scrooloose/syntastic' "{{{
+      let g:syntastic_error_symbol = '✗'
+      let g:syntastic_style_error_symbol = '✠'
+      let g:syntastic_warning_symbol = '∆'
+      let g:syntastic_style_warning_symbol = '≈'
+    "}}}
+  "}}}
+
+  " color schemes {{{
+    NeoBundle 'altercation/vim-colors-solarized'
+    NeoBundle 'nanotech/jellybeans.vim'
+    NeoBundle 'tomasr/molokai'
+    NeoBundle 'chriskempson/vim-tomorrow-theme'
+    NeoBundle 'chriskempson/base16-vim'
+    NeoBundle 'w0ng/vim-hybrid'
+    NeoBundle 'sjl/badwolf'
+    NeoBundle 'zeis/vim-kolor' "{{{
+      let g:kolor_underlined=1
+    "}}}
+  "}}}
+
 nnoremap <silent> <C-S> :update<CR>
-nnoremap <leader>m :NERDTreeToggle<CR>
-nnoremap <leader>t :Tagbar<CR>
 nnoremap <leader>ev :split /home/lompy/.vim/vimrc<CR>
 nnoremap <leader>sv :source /home/lompy/.vimrc<CR>
-nnoremap <C-s> :w<CR>
 nnoremap <leader>h :noh<CR>
 nnoremap <leader>l :set list!<CR>
 inoremap kj <Esc>
@@ -37,33 +424,17 @@ call unite#filters#sorter_default#use(['sorter_rank'])
 nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec<CR>
 nnoremap <leader>v :<C-u>Unite -start-insert -no-split buffer<CR>
 
-set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
-set scrolloff=4
-set number
-set autoindent
-set tabstop=2 softtabstop=2 shiftwidth=2 expandtab
-set laststatus=2
 " Before airline:
 " set statusline=%<%f%y\ %h%m%r%{fugitive#statusline()}%=%-14.(%L:%4l,%c%V%)\ %P
-set fillchars+=vert:\ 
-set mouse=a
-set hlsearch
-set autowrite
-set undofile
-set undodir=/home/lompy/.vim/vimundo/
-set shellpipe=>
 hi Underlined cterm=bold ctermfg=5
 call togglebg#map("<F5>")
 
-function! <SID>StripTrailingWhitespaces()
-   " Preparation: save last search, and cursor position.
-   let _s=@/
-   let l = line(".")
-   let c = col(".")
-   " Do the business:
-   %s/\s\+$//e
-   " Clean up: restore previous search history, and cursor position
-   let @/=_s
-   call cursor(l, c)
-endfunction
 autocmd BufWritePre *.py,*.js,*.rb,*.rake,*.coffee,*.haml,*.yml :call <SID>StripTrailingWhitespaces()
+
+set background=dark
+set t_Co=16
+colorscheme solarized
+
+filetype plugin indent on
+syntax enable
+filetype plugin on
