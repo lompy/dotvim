@@ -20,6 +20,7 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'Shougo/unite.vim'
+Plugin 'Shougo/neomru.vim'
 Plugin 'Shougo/vimproc.vim'
 Plugin 'Shougo/neocomplete.vim'
 Plugin 'Shougo/neosnippet.vim'
@@ -38,6 +39,8 @@ Plugin 'nelstrom/vim-qargs'
 Plugin 'tmhedberg/matchit'
 Plugin 'Raimondi/delimitMate'
 Plugin 'bling/vim-airline'
+Plugin 'scrooloose/nerdtree'
+Plugin 'mileszs/ack.vim'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between here and filetype plugin indent on.

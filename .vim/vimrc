@@ -412,17 +412,20 @@
 
 nnoremap <silent> <C-S> :update<CR>
 nnoremap <leader>ev :split /home/lompy/.vim/vimrc<CR>
+nnoremap <leader>ep :split /home/lompy/.vim/VundlePlugins.vim<CR>
 nnoremap <leader>sv :source /home/lompy/.vimrc<CR>
 nnoremap <leader>h :noh<CR>
 nnoremap <leader>l :set list!<CR>
 inoremap kj <Esc>
 inoremap jk <Esc>
 vnoremap <silent> <C-S> <C-C>:update<CR>
-inoremap <silent> <C-S> <C-O>:update<CR>
+inoremap <silent> <C-S> <Esc>:update<CR>
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
-nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec<CR>
-nnoremap <leader>v :<C-u>Unite -start-insert -no-split buffer<CR>
+nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec/async<CR>
+nnoremap <leader>b :<C-u>Unite -start-insert -no-split buffer file_mru<CR>
+nnoremap <leader>a :<C-u>Unite grep:.<CR>
+nnoremap <leader>g :<C-u>Unite -start-insert -no-split -quick-match buffer<CR>
 
 " Before airline:
 " set statusline=%<%f%y\ %h%m%r%{fugitive#statusline()}%=%-14.(%L:%4l,%c%V%)\ %P
