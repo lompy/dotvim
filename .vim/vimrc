@@ -1,4 +1,4 @@
-source VundlePlugins.vim
+source /home/lompy/.vim/VundlePlugins.vim
 syntax enable
 filetype plugin on
 set background=dark
@@ -16,6 +16,9 @@ let NERDTreeBookmarksFile = "~/.vim/NERDTreeBookmarks"
 let g:airline_right_sep = '◖'
 let g:airline_left_sep = '◗'
 let g:airline_symbols_branch = '⎇'
+let g:unite_source_grep_command = 'ack-grep'
+let g:unite_source_grep_default_opts = '--no-heading --no-color -k -H'
+let delimitMate_autoclose = 0
 
 imap <C-k> <Plug>(neosnippet_expand_or_jump)
 smap <C-k> <Plug>(neosnippet_expand_or_jump)
@@ -24,6 +27,7 @@ nnoremap <silent> <C-S> :update<CR>
 nnoremap <leader>m :NERDTreeToggle<CR>
 nnoremap <leader>t :Tagbar<CR>
 nnoremap <leader>ev :split /home/lompy/.vim/vimrc<CR>
+nnoremap <leader>ep :split /home/lompy/.vim/VundlePlugins.vim<CR>
 nnoremap <leader>sv :source /home/lompy/.vimrc<CR>
 nnoremap <C-s> :w<CR>
 nnoremap <leader>h :noh<CR>
@@ -31,16 +35,18 @@ nnoremap <leader>l :set list!<CR>
 inoremap kj <Esc>
 inoremap jk <Esc>
 vnoremap <silent> <C-S> <C-C>:update<CR>
-inoremap <silent> <C-S> <C-O>:update<CR>
+inoremap <silent> <C-S> <Esc>:update<CR>
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
-nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec<CR>
-nnoremap <leader>v :<C-u>Unite -start-insert -no-split buffer<CR>
+nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec/async<CR>
+nnoremap <leader>b :<C-u>Unite -start-insert -no-split buffer file_mru<CR>
+nnoremap <leader>a :<C-u>Unite grep:.<CR>
+nnoremap <leader>g :<C-u>Unite -start-insert -no-split -quick-match buffer<CR>
 
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 set scrolloff=4
 set number
-set autoindent
+"set autoindent
 set tabstop=2 softtabstop=2 shiftwidth=2 expandtab
 set laststatus=2
 " Before airline:
