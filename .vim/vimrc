@@ -1,3 +1,6 @@
+  " vimrc folding {{{
+    autocmd FileType vimrc set foldmethod=marker
+  "}}}
   " NeoBundle init {{{
   if has('vim_starting')
     set nocompatible
@@ -5,12 +8,8 @@
   endif
   call neobundle#rc(expand('~/.vim/bundle/'))
   NeoBundleFetch 'Shougo/neobundle.vim'
-
-  " My list
-  NeoBundle 'Raimondi/delimitMate'
-
   NeoBundleCheck
-  " }}}
+  "}}}
 
   " functions {{{
   function! Preserve(command) "{{{
@@ -98,21 +97,13 @@
   set incsearch                                       "incremental searching
   set ignorecase                                      "ignore case for searching
   set smartcase                                       "do case-sensitive if there's a capital letter
-  if executable('ack-grep')
-    set grepprg=ack-grep\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
-    set grepformat=%f:%l:%c:%m
-  endif
-  if executable('ag')
-    set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
-    set grepformat=%f:%l:%c:%m
-  endif
+  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepformat=%f:%l:%c:%m
 
   " vim file/folder management {{{
     " persistent undo
-    if exists('+undofile')
-      set undofile
-      set undodir=~/.vim/cache/undo
-    endif
+    set undofile
+    set undodir=~/.vim/cache/undo
 
     " backups
     set backup
@@ -150,11 +141,6 @@
   let &colorcolumn=120
 
   set fillchars+=vert:\                               "space instead of | as vertical delimiter
-
-  if has('conceal')
-    set conceallevel=1
-    set listchars+=conceal:Δ
-  endif
 "}}}
 
 " plugin/mapping configuration {{{
@@ -166,7 +152,7 @@
       let g:airline_symbols_branch = '⎇'
     "}}}
     NeoBundle 'tpope/vim-surround' "{{{
-      let g:surround_100 = "do \r\n\nend" "surround letter d for do .. end
+      let g:surround_100 = "do \r\nend" "surround letter d for do .. end
     "}}}
     NeoBundle 'tpope/vim-repeat'
     NeoBundle 'tpope/vim-eunuch'
@@ -200,6 +186,7 @@
       endfunction
       autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
       autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
+  "}}}
   "}}}
 
   " javascript {{{
@@ -280,8 +267,8 @@
   "}}}
 
   " editing {{{
-    NeoBundleLazy 'editorconfig/editorconfig-vim', {'autoload':{'insert':1}}
     NeoBundle 'tpope/vim-endwise'
+    NeoBundle 'tpope/vim-abolish'
     NeoBundle 'tpope/vim-speeddating'
     NeoBundle 'vim-scripts/tComment'
     NeoBundle 'terryma/vim-expand-region'
@@ -304,16 +291,13 @@
     NeoBundle 'justinmk/vim-sneak' "{{{
       let g:sneak#streak = 1
     "}}}
-    NeoBundle 'Lokaltog/vim-easymotion' "{{{
-      let g:easymotion_leader_key = '<leader>'
-    "}}}
+    NeoBundle 'Lokaltog/vim-easymotion'
   "}}}
 
   " navigation {{{
     NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
       let NERDTreeShowHidden=1
       let NERDTreeQuitOnOpen=0
-      let NERDTreeShowLineNumbers=1
       let NERDTreeChDirMode=0
       let NERDTreeShowBookmarks=1
       let NERDTreeIgnore=['\.git','\.hg']
@@ -341,11 +325,9 @@
       let g:unite_source_rec_max_cache_files=5000
       let g:unite_prompt='» '
 
-      if executable('ack-grep')
-        let g:unite_source_grep_command='ack-grep'
-        let g:unite_source_grep_default_opts='--no-heading --no-color -C4'
-        let g:unite_source_grep_recursive_opt=''
-      endif
+      let g:unite_source_grep_command='ag'
+      let g:unite_source_grep_default_opts='--nocolor --nogroup -S'
+      let g:unite_source_grep_recursive_opt=''
 
       function! s:unite_settings()
         nmap <buffer> Q <plug>(unite_exit)
@@ -357,10 +339,10 @@
       nmap <space> [unite]
       nnoremap [unite] <nop>
 
-      nnoremap <silent> [unite]<space> :<C-u>Unite -toggle -auto-resize -buffer-name=mixed file_rec/async:! buffer file_mru bookmark<cr><c-u>
+      nnoremap <silent> [unite]<space> :<C-u>Unite -toggle -auto-resize -buffer-name=mixed buffer file_mru bookmark file_rec/async:!<cr><c-u>
       nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec/async:!<cr><c-u>
       nnoremap <silent> [unite]e :<C-u>Unite -buffer-name=recent file_mru<cr>
-      nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks history/yank<cr>
+      nnoremap <silent> [unite]p :<C-u>Unite -buffer-name=yanks history/yank<cr>
       nnoremap <silent> [unite]l :<C-u>Unite -auto-resize -buffer-name=line line<cr>
       nnoremap <silent> [unite]b :<C-u>Unite -auto-resize -buffer-name=buffers buffer<cr>
       nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
@@ -398,7 +380,10 @@
   "}}}
 
   " color schemes {{{
-    NeoBundle 'altercation/vim-colors-solarized'
+    NeoBundle 'altercation/vim-colors-solarized' "{{{
+      hi Underlined cterm=bold ctermfg=5
+      call togglebg#map("<F5>")
+    " }}}
     NeoBundle 'nanotech/jellybeans.vim'
     NeoBundle 'tomasr/molokai'
     NeoBundle 'chriskempson/vim-tomorrow-theme'
@@ -409,30 +394,62 @@
       let g:kolor_underlined=1
     "}}}
   "}}}
+"}}}
 
-nnoremap <silent> <C-S> :update<CR>
-nnoremap <leader>ev :split /home/lompy/.vim/vimrc<CR>
-nnoremap <leader>ep :split /home/lompy/.vim/VundlePlugins.vim<CR>
-nnoremap <leader>sv :source /home/lompy/.vimrc<CR>
-nnoremap <leader>h :noh<CR>
-nnoremap <leader>l :set list!<CR>
-inoremap kj <Esc>
-inoremap jk <Esc>
-vnoremap <silent> <C-S> <C-C>:update<CR>
-inoremap <silent> <C-S> <Esc>:update<CR>
-call unite#filters#matcher_default#use(['matcher_fuzzy'])
-call unite#filters#sorter_default#use(['sorter_rank'])
-nnoremap <leader>f :<C-u>Unite -start-insert -no-split file_rec/async<CR>
-nnoremap <leader>b :<C-u>Unite -start-insert -no-split buffer file_mru<CR>
-nnoremap <leader>a :<C-u>Unite grep:.<CR>
-nnoremap <leader>g :<C-u>Unite -start-insert -no-split -quick-match buffer<CR>
+" mappings {{{
+  nmap <leader>fef :call Preserve("normal gg=G")<CR>
+  nnoremap <leader>ev :split ~/.vim/vimrc<CR>
+  nnoremap <leader>ep :split ~/.vim/VundlePlugins.vim<CR>
+  nnoremap <leader>sv :source ~/.vimrc<CR>
+  nnoremap <leader>h :noh<CR>
+  nnoremap <leader>l :set list!<CR>
+  inoremap kj <Esc>
+  inoremap jk <Esc>
+  vnoremap <silent> <C-S> <C-C>:update<CR>
+  inoremap <silent> <C-S> <Esc>:update<CR>
+  nmap <leader>f$ :call StripTrailingWhitespace()<CR>
 
-" Before airline:
-" set statusline=%<%f%y\ %h%m%r%{fugitive#statusline()}%=%-14.(%L:%4l,%c%V%)\ %P
-hi Underlined cterm=bold ctermfg=5
-call togglebg#map("<F5>")
+  " sane regex {{{
+    nnoremap / /\v
+    vnoremap / /\v
+    nnoremap ? ?\v
+    vnoremap ? ?\v
+    nnoremap :s/ :s/\v
+  " }}}
 
-autocmd BufWritePre *.py,*.js,*.rb,*.rake,*.coffee,*.haml,*.yml :call <SID>StripTrailingWhitespaces()
+  " command-line window {{{
+    nnoremap q: q:i
+    nnoremap q/ q/i
+    nnoremap q? q?i
+  " }}}
+
+  " folds {{{
+    nnoremap zr zr:echo &foldlevel<cr>
+    nnoremap zm zm:echo &foldlevel<cr>
+    nnoremap zR zR:echo &foldlevel<cr>
+    nnoremap zM zM:echo &foldlevel<cr>
+  " }}}
+
+  " screen line scroll {{{
+    nnoremap <silent> j gj
+    nnoremap <silent> k gk
+  " }}}
+
+  " reselect visual block after indent {{{
+    vnoremap < <gv
+    vnoremap > >gv
+  "}}}
+  
+  " make Y consistent with C and D. See :help Y.
+  nnoremap Y y$
+
+  " hide annoying quit message
+  nnoremap <C-c> <C-c>:echo<cr>
+
+  " window killer
+  nnoremap <silent> Q :call CloseWindowOrKillBuffer()<cr>
+  
+  "}}}
 
 set background=dark
 set t_Co=16
