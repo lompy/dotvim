@@ -1,6 +1,3 @@
-  " vimrc folding {{{
-    autocmd FileType vimrc set foldmethod=marker
-  "}}}
   " NeoBundle init {{{
   if has('vim_starting')
     set nocompatible
@@ -147,12 +144,12 @@
   " core {{{
     NeoBundle 'matchit.zip'
     NeoBundle 'bling/vim-airline' "{{{
-      let g:airline_right_sep = '◖'
-      let g:airline_left_sep = '◗'
+      let g:airline_right_sep = ''
+      let g:airline_left_sep = ''
       let g:airline_symbols_branch = '⎇'
     "}}}
     NeoBundle 'tpope/vim-surround' "{{{
-      let g:surround_100 = "do \r\nend" "surround letter d for do .. end
+      let g:surround_100 = "do \r\nend" "surround letter 'd' for do .. end
     "}}}
     NeoBundle 'tpope/vim-repeat'
     NeoBundle 'tpope/vim-eunuch'
@@ -227,7 +224,9 @@
   
   " scm {{{
     NeoBundle 'mhinz/vim-signify' "{{{
-      let g:signify_update_on_bufenter=0
+      let g:signify_update_on_bufenter = 0
+      let g:signify_disable_by_default = 1
+      "nmap <leader>gt :SignifyToggle
     "}}}
     if executable('hg')
       NeoBundle 'bitbucket:ludovicchabant/vim-lawrencium'
@@ -405,16 +404,19 @@
   nnoremap <leader>l :set list!<CR>
   inoremap kj <Esc>
   inoremap jk <Esc>
+  nnoremap <silent> <C-S> :update<CR>
   vnoremap <silent> <C-S> <C-C>:update<CR>
   inoremap <silent> <C-S> <Esc>:update<CR>
   nmap <leader>f$ :call StripTrailingWhitespace()<CR>
+  nnoremap <silent> <C-E> <C-E>j
+  nnoremap <silent> <C-Y> <C-Y>k
 
   " sane regex {{{
     nnoremap / /\v
     vnoremap / /\v
     nnoremap ? ?\v
     vnoremap ? ?\v
-    nnoremap :s/ :s/\v
+    nnoremap :s: :s:\v
   " }}}
 
   " command-line window {{{
@@ -451,7 +453,7 @@
   
   "}}}
 
-set background=dark
+set background=light
 set t_Co=16
 colorscheme solarized
 
