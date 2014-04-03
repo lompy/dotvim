@@ -46,7 +46,7 @@
   "}}}
 
   " base configuration {{{
-  set timeoutlen=300                                  "mapping timeout
+  set timeoutlen=500                                  "mapping timeout
   set ttimeoutlen=50                                  "keycode timeout
 
   set mouse=a                                         "enable mouse
@@ -135,7 +135,6 @@
   set cursorline
   autocmd WinLeave * setlocal nocursorline
   autocmd WinEnter * setlocal cursorline
-  let &colorcolumn=120
 
   set fillchars+=vert:\                               "space instead of | as vertical delimiter
 "}}}
@@ -174,6 +173,13 @@
     NeoBundleLazy 'juvenn/mustache.vim', {'autoload':{'filetypes':['mustache']}}
     NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
     NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache']}} "{{{
+      " let g:user_emmet_settings = {
+      " \  'lang' : 'coffee',
+      " \  'html' : {
+      " \    'filters' : 'html',
+      " \    'indentation' : '  '
+      " \  },
+      " \}
       function! s:zen_html_tab()
         let line = getline('.')
         if match(line, '<.*>') < 0
@@ -181,8 +187,8 @@
         endif
         return "\<c-y>n"
       endfunction
-      autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
-      autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
+      " autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
+      " autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
   "}}}
   "}}}
 
@@ -262,6 +268,7 @@
       let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
       let g:neocomplete#force_overwrite_completefunc = 1
       let g:neocomplete#sources#syntax#min_keyword_length = 3
+      let g:neocomplete#max_list = 5
     "}}}
   "}}}
 
@@ -300,7 +307,7 @@
       let NERDTreeChDirMode=0
       let NERDTreeShowBookmarks=1
       let NERDTreeIgnore=['\.git','\.hg']
-      let NERDTreeBookmarksFile='~/.vim/cache/NERDTreeBookmarks'
+      let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
       nnoremap <Leader>m :NERDTreeToggle<CR>
     "}}}
     NeoBundleLazy 'majutsushi/tagbar', {'autoload':{'commands':'TagbarToggle'}} "{{{
@@ -347,6 +354,7 @@
       nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
       nnoremap <silent> [unite]m :<C-u>Unite -auto-resize -buffer-name=mappings mapping<cr>
       nnoremap <silent> [unite]s :<C-u>Unite -quick-match buffer<cr>
+      nnoremap <silent> [unite]r :<C-u>Unite resume<cr>
     "}}}
     NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
     NeoBundleLazy 'tsukkee/unite-tag', {'autoload':{'unite_sources':['tag','tag/file']}} "{{{
@@ -436,11 +444,6 @@
     nnoremap <silent> j gj
     nnoremap <silent> k gk
   " }}}
-
-  " reselect visual block after indent {{{
-    vnoremap < <gv
-    vnoremap > >gv
-  "}}}
   
   " make Y consistent with C and D. See :help Y.
   nnoremap Y y$
@@ -453,7 +456,7 @@
   
   "}}}
 
-set background=light
+set background=dark
 set t_Co=16
 colorscheme solarized
 
