@@ -310,7 +310,6 @@
       let NERDTreeShowHidden=1
       let NERDTreeQuitOnOpen=0
       let NERDTreeChDirMode=0
-      let NERDTreeShowBookmarks=1
       let NERDTreeIgnore=['\.git','\.hg']
       let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
       nnoremap <Leader>m :NERDTreeToggle<CR>
@@ -462,7 +461,11 @@
 
   " window killer
   nnoremap <silent> Q :call CloseWindowOrKillBuffer()<cr>
-  
+
+  " insert current date
+  :nnoremap <F6> "=strftime("%Y-%m-%d")<CR>P
+  :inoremap <F6> <C-R>=strftime("%Y-%m-%d")<CR>
+
   "}}}
 
 set background=dark
