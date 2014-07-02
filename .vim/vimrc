@@ -69,10 +69,10 @@
   set autoindent                                      "automatically indent to match adjacent lines
   set expandtab                                       "spaces instead of tabs
   set smarttab                                        "use shiftwidth to enter tabs
-  let &tabstop=2                                       "number of spaces per tab for display
-  let &softtabstop=2                                   "number of spaces per tab in insert mode
-  let &shiftwidth=2                                    "number of spaces when indenting
-  set nolist                                            "highlight whitespace
+  let &tabstop=2                                      "number of spaces per tab for display
+  let &softtabstop=2                                  "number of spaces per tab in insert mode
+  let &shiftwidth=2                                   "number of spaces when indenting
+  set nolist                                          "highlight whitespace
   set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
   set shiftround
   set linebreak
@@ -172,7 +172,6 @@
     NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
     NeoBundleLazy 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sass']}}
     NeoBundleLazy 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
-    NeoBundleLazy 'ap/vim-css-color', {'autoload':{'filetypes':['css','scss','sass','less','styl']}}
     NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
     NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
     NeoBundleLazy 'juvenn/mustache.vim', {'autoload':{'filetypes':['mustache']}}
@@ -199,15 +198,15 @@
   "}}}
 
   " javascript {{{
-    NeoBundleLazy 'marijnh/tern_for_vim', {
-      \ 'autoload': { 'filetypes': ['javascript'] },
-      \ 'build': {
-        \ 'mac': 'npm install',
-        \ 'unix': 'npm install',
-        \ 'cygwin': 'npm install',
-        \ 'windows': 'npm install',
-      \ },
-    \ }
+    " NeoBundleLazy 'marijnh/tern_for_vim', {
+    "   \ 'autoload': { 'filetypes': ['javascript'] },
+    "   \ 'build': {
+    "     \ 'mac': 'npm install',
+    "     \ 'unix': 'npm install',
+    "     \ 'cygwin': 'npm install',
+    "     \ 'windows': 'npm install',
+    "   \ },
+    " \ }
     NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
     NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}} "{{{
       nnoremap <leader>fjs :call JsBeautify()<cr>
@@ -223,6 +222,7 @@
     NeoBundle 'vim-ruby/vim-ruby'
     NeoBundle 'tpope/vim-rails'
     NeoBundle 'tpope/vim-bundler'
+    NeoBundle 'tpope/vim-rake'
   "}}}
   
   " python {{{
@@ -238,7 +238,7 @@
     NeoBundle 'mhinz/vim-signify' "{{{
       let g:signify_update_on_bufenter = 0
       let g:signify_disable_by_default = 1
-      "nmap <leader>gt :SignifyToggle
+      " nmap <leader>gt :SignifyToggle
     "}}}
     if executable('hg')
       NeoBundle 'bitbucket:ludovicchabant/vim-lawrencium'
@@ -282,23 +282,13 @@
     NeoBundle 'tpope/vim-endwise'
     NeoBundle 'tpope/vim-abolish'
     NeoBundle 'tpope/vim-speeddating'
-    NeoBundle 'vim-scripts/tComment'
+    NeoBundle 'tpope/vim-commentary'
     NeoBundle 'terryma/vim-expand-region'
     " NeoBundle 'terryma/vim-multiple-cursors'
     " NeoBundle 'chrisbra/NrrwRgn'
     NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
-      nmap <Leader>a& :Tabularize /&<CR>
-      vmap <Leader>a& :Tabularize /&<CR>
-      nmap <Leader>a= :Tabularize /=<CR>
-      vmap <Leader>a= :Tabularize /=<CR>
-      nmap <Leader>a: :Tabularize /:<CR>
-      vmap <Leader>a: :Tabularize /:<CR>
-      nmap <Leader>a:: :Tabularize /:\zs<CR>
-      vmap <Leader>a:: :Tabularize /:\zs<CR>
-      nmap <Leader>a, :Tabularize /,<CR>
-      vmap <Leader>a, :Tabularize /,<CR>
-      nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-      vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
+      nnoremap <Leader>ta :Tabularize/
+      vnoremap <Leader>ta :Tabularize/
     "}}}
     NeoBundle 'justinmk/vim-sneak' "{{{
       let g:sneak#streak = 1
@@ -306,14 +296,19 @@
   "}}}
 
   " navigation {{{
-    NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
-      let NERDTreeShowHidden=1
-      let NERDTreeQuitOnOpen=0
-      let NERDTreeChDirMode=0
-      let NERDTreeIgnore=['\.git','\.hg']
-      let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
-      nnoremap <Leader>m :NERDTreeToggle<CR>
-    "}}}
+    NeoBundle 'tpope/vim-vinegar' "{{{
+      let g:netrw_banner       = 0
+      let g:netrw_liststyle    = 3
+      let g:netrw_sort_options = 'i'
+    " }}}
+    " NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
+    "   let NERDTreeShowHidden=1
+    "   let NERDTreeQuitOnOpen=0
+    "   let NERDTreeChDirMode=0
+    "   let NERDTreeIgnore=['\.git','\.hg']
+    "   let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
+    "   nnoremap <Leader>m :NERDTreeToggle<CR>
+    " "}}}
   "}}}
   
   " unite {{{
@@ -327,7 +322,7 @@
       endfunction
 
       let g:unite_data_directory='~/.vim/cache/unite'
-      let g:unite_enable_start_insert=1
+      let g:unite_enable_start_insert=0
       let g:unite_source_history_yank_enable=1
       let g:unite_source_rec_max_cache_files=5000
       let g:unite_prompt='» '
@@ -345,8 +340,8 @@
       endfunction
       autocmd FileType unite call s:unite_settings()
 
-      nmap <space> [unite]
       nnoremap [unite] <nop>
+      nmap <space> [unite]
 
       nnoremap <silent> [unite]<space> :<C-u>Unite -toggle -auto-resize -buffer-name=mixed buffer bookmark file_rec/async:!<cr><c-u>
       nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec/async:!<cr><c-u>
@@ -476,7 +471,7 @@
 
   "}}}
 
-set background=dark
+set background=light
 set t_Co=16
 colorscheme solarized
 
