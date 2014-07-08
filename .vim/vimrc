@@ -223,6 +223,12 @@
     NeoBundle 'tpope/vim-rails'
     NeoBundle 'tpope/vim-bundler'
     NeoBundle 'tpope/vim-rake'
+    NeoBundle 'thoughtbot/vim-rspec' "{{{
+      " map <Leader>t :call RunCurrentSpecFile()<CR>
+      " map <Leader>s :call RunNearestSpec()<CR>
+      " map <Leader>l :call RunLastSpec()<CR>
+      " map <Leader>a :call RunAllSpecs()<CR>
+    "}}}
   "}}}
   
   " python {{{
@@ -379,6 +385,7 @@
     NeoBundle 'kana/vim-textobj-indent'
     NeoBundle 'kana/vim-textobj-entire'
     NeoBundle 'lucapette/vim-textobj-underscore'
+    NeoBundle 'nelstrom/vim-textobj-rubyblock'
   "}}}
 
   " misc {{{
