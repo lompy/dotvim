@@ -223,6 +223,12 @@
     NeoBundle 'tpope/vim-rails'
     NeoBundle 'tpope/vim-bundler'
     NeoBundle 'tpope/vim-rake'
+    NeoBundle 'thoughtbot/vim-rspec' "{{{
+      map <Leader>rf :call RunCurrentSpecFile()<CR>
+      map <Leader>rc :call RunNearestSpec()<CR>
+      map <Leader>rl :call RunLastSpec()<CR>
+      map <Leader>ra :call RunAllSpecs()<CR>
+    "}}}
   "}}}
   
   " python {{{
@@ -303,6 +309,7 @@
       let NERDTreeIgnore=['\.git','\.hg']
       let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
       nnoremap <Leader>m :NERDTreeToggle<CR>
+      nnoremap <Leader>n :NERDTreeFind<CR>
     "}}}
   "}}}
   
@@ -467,6 +474,9 @@
   "}}}
 
 set background=dark
+if !empty(glob('~/.vim/light_background.vim'))
+  source ~/.vim/light_background.vim
+endif
 set t_Co=16
 colorscheme solarized
 
