@@ -386,6 +386,7 @@
     NeoBundle 'kana/vim-textobj-indent'
     NeoBundle 'kana/vim-textobj-entire'
     NeoBundle 'lucapette/vim-textobj-underscore'
+    NeoBundle 'nelstrom/vim-textobj-rubyblock'
   "}}}
 
   " misc {{{
