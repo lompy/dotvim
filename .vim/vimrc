@@ -421,7 +421,6 @@
 " mappings {{{
   nmap <leader>fef :call Preserve("normal gg=G")<CR>
   nnoremap <leader>ev :split ~/.vim/vimrc<CR>
-  nnoremap <leader>ep :split ~/.vim/VundlePlugins.vim<CR>
   nnoremap <leader>sv :source ~/.vimrc<CR>
   nnoremap <leader>h :noh<CR>
   nnoremap <leader>l :set list!<CR>
@@ -433,14 +432,8 @@
   nmap <leader>f$ :call StripTrailingWhitespace()<CR>
   nnoremap <silent> <C-E> <C-E>j
   nnoremap <silent> <C-Y> <C-Y>k
-
-  " sane regex {{{
-    nnoremap / /\v
-    vnoremap / /\v
-    nnoremap ? ?\v
-    vnoremap ? ?\v
-    nnoremap :s: :s:\v
-  " }}}
+  nnoremap <silent> <C-H> ^
+  nnoremap <silent> <C-L> $
 
   " command-line window {{{
     nnoremap q: q:i
