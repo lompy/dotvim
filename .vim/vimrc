@@ -339,7 +339,8 @@
         nmap <buffer> Q <plug>(unite_exit)
         nmap <buffer> <esc> <plug>(unite_exit)
         imap <buffer> <esc> <plug>(unite_exit)
-        nmap <buffer> W <plug>(unite_redraw)
+        nmap <buffer> <C-U> <plug>(unite_redraw)
+        imap <buffer> <C-U> <plug>(unite_redraw)
       endfunction
       autocmd FileType unite call s:unite_settings()
 
