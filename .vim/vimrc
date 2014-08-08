@@ -140,6 +140,8 @@
   set fillchars+=vert:\                               "space instead of | as vertical delimiter
 "}}}
 
+    NeoBundle 'Shougo/vimfiler'
+    NeoBundle 'Shougo/vimshell'
 " plugin/mapping configuration {{{
   " core {{{
     NeoBundle 'matchit.zip'
