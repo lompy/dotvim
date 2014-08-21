@@ -138,6 +138,10 @@
   autocmd WinEnter * setlocal cursorline
 
   set fillchars+=vert:\                               "space instead of | as vertical delimiter
+
+  " Make the 81st column stand out by Damian Conway
+  highlight ColorColumn
+  call matchadd('ColorColumn', '\%81v', 100)
 "}}}
 
     NeoBundle 'Shougo/vimfiler'
@@ -346,6 +350,7 @@
         imap <buffer> <esc> <plug>(unite_exit)
         nmap <buffer> <C-U> <plug>(unite_redraw)
         imap <buffer> <C-U> <plug>(unite_redraw)
+        nmap <buffer> <leader>o <plug>(unite_toggle_auto_preview)
       endfunction
       autocmd FileType unite call s:unite_settings()
 
