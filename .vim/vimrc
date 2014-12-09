@@ -156,7 +156,6 @@
   call matchadd('ColorColumn', '\%81v', 100)
 "}}}
 
-    NeoBundle 'Shougo/vimfiler'
     NeoBundle 'Shougo/vimshell'
 " plugin/mapping configuration {{{
   " core {{{
@@ -165,6 +164,8 @@
       let g:airline_right_sep = ''
       let g:airline_left_sep = ''
       let g:airline_symbols_branch = '⎇'
+      let g:airline#extensions#whitespace#trailing_format = 'trail[%s]'
+      let g:airline#extensions#whitespace#mixed_indent_format = 'mix[%s]'
     "}}}
     NeoBundle 'tpope/vim-surround' "{{{
       let g:surround_100 = "do \r\nend" "surround letter 'd' for do .. end
@@ -324,14 +325,40 @@
   "}}}
 
   " navigation {{{
+    NeoBundleLazy 'Shougo/vimfiler', {'autoload':{'commands':['VimFiler','VimFilerDir']}} "{{{
+      nnoremap <Leader>m :VimFiler -explorer<CR>
+      nnoremap <Leader>n :VimFiler -find -explorer<CR>
+      let g:vimfiler_tree_leaf_icon = " "
+      let g:vimfiler_tree_closed_icon = "▸"
+      let g:vimfiler_tree_opened_icon = "▾"
+      let g:vimfiler_tree_leaf_icon = "|"
+      let g:vimfiler_tree_indentation = 1
+      let g:vimfiler_expand_jump_to_first_child = 0
+      autocmd FileType vimfiler nmap <buffer><silent> <2-LeftMouse> :call <SID>vimfiler_on_double_click()<CR>
+      function! s:vimfiler_on_double_click()
+        let context = vimfiler#get_context()
+        if context.explorer
+          let mapping = vimfiler#mappings#smart_cursor_map(
+                \ "\<Plug>(vimfiler_expand_tree)",
+                \ "\<Plug>(vimfiler_edit_file)"
+                \ )
+        else
+          let mapping = vimfiler#mappings#smart_cursor_map(
+                \ "\<Plug>(vimfiler_cd_file)",
+                \ "\<Plug>(vimfiler_edit_file)"
+                \ )
+        endif
+        execute "normal " . mapping
+      endfunction
+    "}}}
     NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
       let NERDTreeShowHidden=1
       let NERDTreeQuitOnOpen=0
       let NERDTreeChDirMode=0
       let NERDTreeIgnore=['\.git','\.hg']
       let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
-      nnoremap <Leader>m :NERDTreeToggle<CR>
-      nnoremap <Leader>n :NERDTreeFind<CR>
+      " nnoremap <Leader>m :NERDTreeToggle<CR>
+      " nnoremap <Leader>n :NERDTreeFind<CR>
     "}}}
   "}}}
   
@@ -435,6 +462,8 @@
     NeoBundle 'chriskempson/vim-tomorrow-theme'
     NeoBundle 'chriskempson/base16-vim'
     NeoBundle 'w0ng/vim-hybrid'
+    NeoBundle 'croaky/vim-colors-github'
+    NeoBundle 'john2x/flatui.vim'
     NeoBundle 'sjl/badwolf'
     NeoBundle 'zeis/vim-kolor' "{{{
       let g:kolor_underlined=1
@@ -495,12 +524,22 @@
   nnoremap gz :!zeal --query "<cword>"&<CR><CR>
   "}}}
 
-" set background=dark
-" if !empty(glob('~/.vim/light_background.vim'))
-"   source ~/.vim/light_background.vim
-" endif
-" set t_Co=16
-" colorscheme solarized
+set background=dark
+if !empty(glob('~/.vim/light_background.vim'))
+  source ~/.vim/light_background.vim
+endif
+set t_Co=16
+colorscheme solarized
+
+ " Turn off most colors {{{
+  exe "hi! link Identifier Normal"
+  exe "hi! link Statement Normal"
+  hi! link Type Normal
+  hi! link Underlined Normal
+  hi! link Todo Normal
+  hi! link SpecialKey Normal
+  hi! link NonText Normal
+ " }}}
 
 filetype plugin indent on
 syntax enable
