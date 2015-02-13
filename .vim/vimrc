@@ -43,7 +43,7 @@
     let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
     " never bdelete a nerd tree
-    if matchstr(expand("%"), 'NERD') == 'NERD'
+    if matchstr(expand("%"), 'vimfiler') == 'vimfiler'
       wincmd c
       return
     endif
@@ -194,9 +194,8 @@
     NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
     NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
     NeoBundleLazy 'juvenn/mustache.vim', {'autoload':{'filetypes':['mustache']}}
-    NeoBundleLazy 'vim-scripts/smarty.vim', {'autoload':{'filetypes':['tmpl','tpl']}}
     NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
-    NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl']}} "{{{
+    NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty']}} "{{{
       " let g:user_emmet_settings = {
       " \  'lang' : 'coffee',
       " \  'html' : {
@@ -261,14 +260,6 @@
   "}}}
   
   " scm {{{
-    NeoBundle 'mhinz/vim-signify' "{{{
-      let g:signify_update_on_bufenter = 0
-      let g:signify_disable_by_default = 1
-      " nmap <leader>gt :SignifyToggle
-    "}}}
-    if executable('hg')
-      NeoBundle 'bitbucket:ludovicchabant/vim-lawrencium'
-    endif
     NeoBundle 'tpope/vim-fugitive' "{{{
       nnoremap <silent> <leader>gs :Gstatus<CR>
       nnoremap <silent> <leader>gd :Gdiff<CR>
@@ -280,10 +271,6 @@
       nnoremap <silent> <leader>gr :Gremove<CR>
       autocmd FileType gitcommit nmap <buffer> U :Git checkout -- <C-r><C-g><CR>
       autocmd BufReadPost fugitive://* set bufhidden=delete
-    "}}}
-    NeoBundleLazy 'gregsexton/gitv', {'depends':['tpope/vim-fugitive'], 'autoload':{'commands':'Gitv'}} "{{{
-      nnoremap <silent> <leader>gv :Gitv<CR>
-      nnoremap <silent> <leader>gV :Gitv!<CR>
     "}}}
   "}}}
 
@@ -306,13 +293,12 @@
     "}}}
   "}}}
 
+
   " editing {{{
     NeoBundle 'tpope/vim-endwise'
     NeoBundle 'tpope/vim-abolish'
     NeoBundle 'tpope/vim-speeddating'
     NeoBundle 'tpope/vim-commentary'
-    NeoBundle 'terryma/vim-expand-region'
-    " NeoBundle 'terryma/vim-multiple-cursors'
     " NeoBundle 'chrisbra/NrrwRgn'
     NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
       nnoremap <Leader>ta :Tabularize/
@@ -350,15 +336,6 @@
         endif
         execute "normal " . mapping
       endfunction
-    "}}}
-    NeoBundleLazy 'scrooloose/nerdtree', {'autoload':{'commands':['NERDTreeToggle','NERDTreeFind']}} "{{{
-      let NERDTreeShowHidden=1
-      let NERDTreeQuitOnOpen=0
-      let NERDTreeChDirMode=0
-      let NERDTreeIgnore=['\.git','\.hg']
-      let NERDTreeBookmarksFile=expand('~/.vim/cache/NERDTreeBookmarks')
-      " nnoremap <Leader>m :NERDTreeToggle<CR>
-      " nnoremap <Leader>n :NERDTreeFind<CR>
     "}}}
   "}}}
   
@@ -420,7 +397,6 @@
 
     "}}}
     NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
-    NeoBundleLazy 'h1mesuke/unite-outline', {'autoload':{'unite_sources':'outline'}}
     NeoBundleLazy 'tsukkee/unite-tag', {'autoload':{'unite_sources':['tag','tag/file']}} "{{{
       nnoremap <silent> [unite]t :<C-u>Unite -auto-resize -buffer-name=tag tag tag/file<cr>
     "}}}
@@ -438,6 +414,7 @@
     NeoBundle 'kana/vim-textobj-user'
     NeoBundle 'kana/vim-textobj-indent'
     NeoBundle 'kana/vim-textobj-entire'
+    NeoBundle 'kana/vim-textobj-line'
     NeoBundle 'lucapette/vim-textobj-underscore'
     NeoBundle 'nelstrom/vim-textobj-rubyblock'
   "}}}
@@ -446,11 +423,12 @@
     NeoBundle 'henrik/vim-indexed-search'
     NeoBundle 'thinca/vim-qfreplace'
     NeoBundle 'scrooloose/syntastic' "{{{
-      let g:syntastic_error_symbol = '✗'
-      let g:syntastic_style_error_symbol = '✠'
-      let g:syntastic_warning_symbol = '∆'
+      let g:syntastic_error_symbol = 'e'
+      let g:syntastic_style_error_symbol = 'œ'
+      let g:syntastic_warning_symbol = 'w'
       let g:syntastic_style_warning_symbol = '≈'
     "}}}
+    NeoBundle 'malkomalko/projections.vim'
   "}}}
 
   " color schemes {{{
@@ -465,9 +443,7 @@
     NeoBundle 'croaky/vim-colors-github'
     NeoBundle 'john2x/flatui.vim'
     NeoBundle 'sjl/badwolf'
-    NeoBundle 'zeis/vim-kolor' "{{{
-      let g:kolor_underlined=1
-    "}}}
+    NeoBundle 'zeis/vim-kolor'
   "}}}
 "}}}
 
@@ -502,11 +478,6 @@
     nnoremap zM zM:echo &foldlevel<cr>
   " }}}
 
-  " screen line scroll {{{
-    nnoremap <silent> j gj
-    nnoremap <silent> k gk
-  " }}}
-  
   " make Y consistent with C and D. See :help Y.
   nnoremap Y y$
 
@@ -522,7 +493,14 @@
 
   " zeal integration
   nnoremap gz :!zeal --query "<cword>"&<CR><CR>
+
+  " abbreviations
+  iab filed field
+  iab thme theme
   "}}}
+
+autocmd FileType php setlocal shiftwidth=2 tabstop=2
+autocmd FileType php setlocal noexpandtab
 
 set background=dark
 if !empty(glob('~/.vim/light_background.vim'))
