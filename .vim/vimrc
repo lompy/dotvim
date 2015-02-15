@@ -54,6 +54,23 @@
       bdelete
     endif
   endfunction "}}}
+
+  function! MyFoldText() " {{{
+    let line = getline(v:foldstart)
+
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
+
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
+
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line . ' … ('. foldedlinecount . ')' . repeat(" ",fillcharcount)
+  endfunction " }}}
+  set foldtext=MyFoldText()
   "}}}
 
   " base configuration {{{
@@ -288,8 +305,9 @@
       let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
       let g:neocomplete#force_overwrite_completefunc = 1
       let g:neocomplete#max_list = 4
-      let g:neocomplete#auto_completion_start_length = 2
+      let g:neocomplete#auto_completion_start_length = 20
       let g:neocomplete#enable_smart_case = 1
+      inoremap <expr><C-N>  neocomplete#start_manual_complete()
     "}}}
   "}}}
 
@@ -444,6 +462,8 @@
     NeoBundle 'john2x/flatui.vim'
     NeoBundle 'sjl/badwolf'
     NeoBundle 'zeis/vim-kolor'
+    NeoBundle 'zeis/vim-kolor'
+    NeoBundle 'DAddYE/soda.vim'
   "}}}
 "}}}
 
@@ -502,22 +522,8 @@
 autocmd FileType php setlocal shiftwidth=2 tabstop=2
 autocmd FileType php setlocal noexpandtab
 
-set background=dark
-if !empty(glob('~/.vim/light_background.vim'))
-  source ~/.vim/light_background.vim
-endif
-set t_Co=16
-colorscheme solarized
-
- " Turn off most colors {{{
-  exe "hi! link Identifier Normal"
-  exe "hi! link Statement Normal"
-  hi! link Type Normal
-  hi! link Underlined Normal
-  hi! link Todo Normal
-  hi! link SpecialKey Normal
-  hi! link NonText Normal
- " }}}
+set t_Co=256
+colorscheme my
 
 filetype plugin indent on
 syntax enable
