@@ -39,6 +39,7 @@
       call mkdir(expand(a:path))
     endif
   endfunction "}}}
+
   function! CloseWindowOrKillBuffer() "{{{
     let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
@@ -70,10 +71,11 @@
     let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
     return line . ' … ('. foldedlinecount . ')' . repeat(" ",fillcharcount)
   endfunction " }}}
-  set foldtext=MyFoldText()
+
   "}}}
 
   " base configuration {{{
+  set foldtext=MyFoldText()                           "pretty folding
   set timeoutlen=500                                  "mapping timeout
   set ttimeoutlen=50                                  "keycode timeout
 
@@ -199,7 +201,7 @@
       \ },
     \ }
   "}}}
-  
+
   " web {{{
     NeoBundleLazy 'tpope/vim-markdown', {'autoload':{'filetypes':['markdown']}} "{{{
       au BufNewFile,BufRead *.md,*.note  setf markdown
@@ -251,9 +253,8 @@
     NeoBundleLazy 'kchmck/vim-coffee-script', {'autoload':{'filetypes':['coffee']}}
     NeoBundleLazy 'mmalecki/vim-node.js', {'autoload':{'filetypes':['javascript']}}
     NeoBundleLazy 'leshill/vim-json', {'autoload':{'filetypes':['javascript','json']}}
-    NeoBundleLazy 'othree/javascript-libraries-syntax.vim', {'autoload':{'filetypes':['javascript','coffee','ls','typescript']}}
   "}}}
-  
+
   " ruby {{{
     NeoBundle 'vim-ruby/vim-ruby'
     NeoBundle 'tpope/vim-rails'
@@ -266,7 +267,7 @@
       map <Leader>ra :call RunAllSpecs()<CR>
     "}}}
   "}}}
-  
+
   " python {{{
     NeoBundleLazy 'klen/python-mode', {'autoload':{'filetypes':['python']}} "{{{
       let g:pymode_rope=0
@@ -275,7 +276,7 @@
       let g:jedi#popup_on_dot=0
     "}}}
   "}}}
-  
+
   " scm {{{
     NeoBundle 'tpope/vim-fugitive' "{{{
       nnoremap <silent> <leader>gs :Gstatus<CR>
@@ -356,7 +357,7 @@
       endfunction
     "}}}
   "}}}
-  
+
   " unite {{{
     NeoBundle 'Shougo/unite.vim' "{{{
       let bundle = neobundle#get('unite.vim')
@@ -517,6 +518,15 @@
   " abbreviations
   iab filed field
   iab thme theme
+
+  " show syntax group
+  nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+    \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+    \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
+  " toggle keyword colors
+  nnoremap [k :hi Keyword ctermfg=4<CR>
+  nnoremap ]k :hi Keyword ctermfg=NONE<CR>
   "}}}
 
 autocmd FileType php setlocal shiftwidth=2 tabstop=2

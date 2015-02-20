@@ -14,12 +14,12 @@ endif
 hi Underlined ctermfg=NONE ctermbg=NONE cterm=underline guifg=NONE guibg=NONE gui=underline
 hi CursorLine ctermfg=NONE ctermbg=NONE cterm=NONE
 
-hi LineNr     ctermfg=8    ctermbg=7 cterm=NONE
-hi VertSplit  ctermfg=8    ctermbg=8 cterm=NONE
-hi Folded     ctermfg=8    ctermbg=7 cterm=NONE
+hi LineNr     ctermfg=8    ctermbg=15 cterm=NONE
+hi VertSplit  ctermfg=8    ctermbg=7  cterm=NONE
+hi Folded     ctermfg=8    ctermbg=15 cterm=NONE
 
-hi Normal ctermfg=8 ctermbg=15 cterm=NONE
-hi Comment ctermfg=0 ctermbg=15 cterm=NONE
+hi Normal ctermfg=8 ctermbg=256 cterm=NONE
+hi Comment ctermfg=0 ctermbg=256 cterm=NONE
 
 hi Boolean    ctermfg=5 ctermbg=NONE cterm=NONE
 hi Character  ctermfg=5 ctermbg=NONE cterm=NONE
