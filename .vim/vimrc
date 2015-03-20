@@ -306,7 +306,7 @@
       let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
       let g:neocomplete#force_overwrite_completefunc = 1
       let g:neocomplete#max_list = 4
-      let g:neocomplete#auto_completion_start_length = 20
+      let g:neocomplete#auto_completion_start_length = 3
       let g:neocomplete#enable_smart_case = 1
       inoremap <expr><C-N>  neocomplete#start_manual_complete()
     "}}}
