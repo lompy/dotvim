@@ -531,6 +531,7 @@
 
 autocmd FileType php setlocal shiftwidth=2 tabstop=2
 autocmd FileType php setlocal noexpandtab
+autocmd FileType gitcommit setlocal nonumber norelativenumber
 
 set t_Co=256
 colorscheme my
