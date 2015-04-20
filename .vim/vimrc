@@ -154,7 +154,7 @@
   set showmatch                                       "automatically highlight matching braces/brackets/etc.
   set matchtime=2                                     "tens of a second to show matching parentheses
   set number
-  set relativenumber
+  " set relativenumber
   set lazyredraw
   set laststatus=2
   set noshowmode
@@ -266,6 +266,11 @@
       map <Leader>rl :call RunLastSpec()<CR>
       map <Leader>ra :call RunAllSpecs()<CR>
     "}}}
+  "}}}
+
+  " clojure {{{
+    NeoBundle 'guns/vim-clojure-static'
+    NeoBundle 'tpope/vim-fireplace'
   "}}}
 
   " python {{{

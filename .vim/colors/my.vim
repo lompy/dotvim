@@ -22,13 +22,14 @@ hi Folded     ctermfg=8    ctermbg=15 cterm=NONE
 hi Normal ctermfg=8 ctermbg=256 cterm=NONE
 hi Comment ctermfg=0 ctermbg=256 cterm=NONE
 
-hi Boolean            ctermfg=5 ctermbg=NONE cterm=NONE
-hi Character          ctermfg=5 ctermbg=NONE cterm=NONE
-hi Float              ctermfg=5 ctermbg=NONE cterm=NONE
-hi String             ctermfg=5 ctermbg=NONE cterm=NONE
-hi Number             ctermfg=5 ctermbg=NONE cterm=NONE
-hi rubySymbol         ctermfg=5 ctermbg=NONE cterm=NONE
-hi rubyPseudoVariable ctermfg=5 ctermbg=NONE cterm=NONE
+hi Boolean             ctermfg=5 ctermbg=NONE cterm=NONE
+hi Character           ctermfg=5 ctermbg=NONE cterm=NONE
+hi Float               ctermfg=5 ctermbg=NONE cterm=NONE
+hi String              ctermfg=5 ctermbg=NONE cterm=NONE
+hi Number              ctermfg=5 ctermbg=NONE cterm=NONE
+hi rubySymbol          ctermfg=5 ctermbg=NONE cterm=NONE
+hi rubyPseudoVariable  ctermfg=5 ctermbg=NONE cterm=NONE
+hi rubyRegexpCharClass ctermfg=5 ctermbg=NONE cterm=NONE
 
 hi Conditional  ctermfg=NONE ctermbg=NONE cterm=NONE
 hi Constant     ctermfg=NONE ctermbg=NONE cterm=NONE
