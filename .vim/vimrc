@@ -10,15 +10,6 @@
 
   " functions {{{
   "
-  " a little more informative version of the above
-  nmap <Leader>sI :call <SID>SynStack()<CR>
-
-  function! <SID>SynStack()
-      if !exists("*synstack")
-          return
-      endif
-      echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-  endfunc
 
   function! Preserve(command) "{{{
     " preparation: save last search, and cursor position.
@@ -37,22 +28,6 @@
   function! EnsureExists(path) "{{{
     if !isdirectory(expand(a:path))
       call mkdir(expand(a:path))
-    endif
-  endfunction "}}}
-
-  function! CloseWindowOrKillBuffer() "{{{
-    let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
-
-    " never bdelete a nerd tree
-    if matchstr(expand("%"), 'vimfiler') == 'vimfiler'
-      wincmd c
-      return
-    endif
-
-    if number_of_windows_to_this_buffer > 1
-      wincmd c
-    else
-      bdelete
     endif
   endfunction "}}}
 
@@ -95,7 +70,7 @@
   set modelines=5
 
   " whitespace
-  set backspace=indent,eol,start                      "allow backspacing everything in insert mode
+  set backspace=2                                     ":set backspace=indent,eol,start
   set autoindent                                      "automatically indent to match adjacent lines
   set expandtab                                       "spaces instead of tabs
   set smarttab                                        "use shiftwidth to enter tabs
@@ -124,7 +99,8 @@
   set incsearch                                       "incremental searching
   set ignorecase                                      "ignore case for searching
   set smartcase                                       "do case-sensitive if there's a capital letter
-  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepprg=ag
+  set grepprg=ag\ --nogroup\ --nocolor
   set grepformat=%f:%l:%c:%m
 
   " vim file/folder management {{{
@@ -146,8 +122,8 @@
     call EnsureExists(&directory)
   "}}}
 
-  let mapleader = ","
-  let g:mapleader = ","
+  let mapleader = " "
+  let g:mapleader = " "
 "}}}
 
 " ui configuration {{{
@@ -167,22 +143,54 @@
 
   set fillchars+=vert:\                               "space instead of | as vertical delimiter
 
-  " Filetypes
-  autocmd BufRead,BufNewFile *.tpl,*tmpl set filetype=smarty
+  " Autocmd
+  augroup vimrcEx
+    autocmd!
+
+    autocmd BufWritePre * :call StripTrailingWhitespace()
+    autocmd BufRead,BufNewFile *.tpl,*tmpl set filetype=smarty
+
+    " When editing a file, always jump to the last known cursor position.
+    " Don't do it for commit messages, when the position is invalid, or when
+    " inside an event handler (happens when dropping a file on gvim).
+    autocmd BufReadPost *
+      \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+      \   exe "normal g`\"" |
+      \ endif
+
+    " Set syntax highlighting for specific file types
+    autocmd BufRead,BufNewFile *.md set filetype=markdown
+
+    " Enable spellchecking for Markdown
+    autocmd FileType markdown setlocal spell
+
+    " Automatically wrap at 80 characters for Markdown
+    autocmd BufRead,BufNewFile *.md setlocal textwidth=80
+
+    " Automatically wrap at 72 characters and spell check git commit messages
+    autocmd FileType gitcommit setlocal textwidth=72
+    autocmd FileType gitcommit setlocal spell
+
+    " Allow stylesheets to autocomplete hyphenated words
+    autocmd FileType css,scss,sass setlocal iskeyword+=-
+
+    autocmd BufNewFile,BufRead *.hamlc setfiletype haml
+    autocmd FileType php setlocal shiftwidth=2 tabstop=2
+    autocmd FileType php setlocal noexpandtab
+    autocmd FileType gitcommit setlocal nonumber norelativenumber
+  augroup END
 
   " Make the 81st column stand out by Damian Conway
   highlight ColorColumn ctermbg=black
   call matchadd('ColorColumn', '\%81v', 100)
 "}}}
 
-    NeoBundle 'Shougo/vimshell'
 " plugin/mapping configuration {{{
   " core {{{
     NeoBundle 'matchit.zip'
     NeoBundle 'bling/vim-airline' "{{{
       let g:airline_right_sep = ''
       let g:airline_left_sep = ''
-      let g:airline_symbols_branch = '⎇'
       let g:airline#extensions#whitespace#trailing_format = 'trail[%s]'
       let g:airline#extensions#whitespace#mixed_indent_format = 'mix[%s]'
     "}}}
@@ -208,30 +216,11 @@
       let g:markdown_fenced_languages = ['css', 'erb=eruby', 'javascript', 'js=javascript', 'json=javascript', 'ruby', 'sass', 'xml']
     "}}}
     NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
-    NeoBundleLazy 'cakebaker/scss-syntax.vim', {'autoload':{'filetypes':['scss','sass']}}
-    NeoBundleLazy 'hail2u/vim-css3-syntax', {'autoload':{'filetypes':['css','scss','sass']}}
     NeoBundleLazy 'othree/html5.vim', {'autoload':{'filetypes':['html']}}
     NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
     NeoBundleLazy 'juvenn/mustache.vim', {'autoload':{'filetypes':['mustache']}}
     NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
     NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty']}} "{{{
-      " let g:user_emmet_settings = {
-      " \  'lang' : 'coffee',
-      " \  'html' : {
-      " \    'filters' : 'html',
-      " \    'indentation' : '  '
-      " \  },
-      " \}
-      function! s:zen_html_tab()
-        let line = getline('.')
-        if match(line, '<.*>') < 0
-          return "\<c-y>,"
-        endif
-        return "\<c-y>n"
-      endfunction
-      " autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
-      " autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
-    autocmd BufNewFile,BufRead *.hamlc setf haml
   "}}}
   "}}}
 
@@ -284,16 +273,7 @@
 
   " scm {{{
     NeoBundle 'tpope/vim-fugitive' "{{{
-      nnoremap <silent> <leader>gs :Gstatus<CR>
-      nnoremap <silent> <leader>gd :Gdiff<CR>
-      nnoremap <silent> <leader>gc :Gcommit<CR>
       nnoremap <silent> <leader>gb :Gblame<CR>
-      nnoremap <silent> <leader>gl :Glog<CR>
-      nnoremap <silent> <leader>gp :Git push<CR>
-      nnoremap <silent> <leader>gw :Gwrite<CR>
-      nnoremap <silent> <leader>gr :Gremove<CR>
-      autocmd FileType gitcommit nmap <buffer> U :Git checkout -- <C-r><C-g><CR>
-      autocmd BufReadPost fugitive://* set bufhidden=delete
     "}}}
   "}}}
 
@@ -323,7 +303,6 @@
     NeoBundle 'tpope/vim-abolish'
     NeoBundle 'tpope/vim-speeddating'
     NeoBundle 'tpope/vim-commentary'
-    " NeoBundle 'chrisbra/NrrwRgn'
     NeoBundleLazy 'godlygeek/tabular', {'autoload':{'commands':'Tabularize'}} "{{{
       nnoremap <Leader>ta :Tabularize/
       vnoremap <Leader>ta :Tabularize/
@@ -334,118 +313,18 @@
     "}}}
   "}}}
 
-  " navigation {{{
-    NeoBundleLazy 'Shougo/vimfiler', {'autoload':{'commands':['VimFiler','VimFilerDir']}} "{{{
-      nnoremap <Leader>m :VimFiler -explorer<CR>
-      nnoremap <Leader>n :VimFiler -find -explorer<CR>
-      let g:vimfiler_tree_leaf_icon = " "
-      let g:vimfiler_tree_closed_icon = "▸"
-      let g:vimfiler_tree_opened_icon = "▾"
-      let g:vimfiler_tree_leaf_icon = "|"
-      let g:vimfiler_tree_indentation = 1
-      let g:vimfiler_expand_jump_to_first_child = 0
-      autocmd FileType vimfiler nmap <buffer><silent> <2-LeftMouse> :call <SID>vimfiler_on_double_click()<CR>
-      function! s:vimfiler_on_double_click()
-        let context = vimfiler#get_context()
-        if context.explorer
-          let mapping = vimfiler#mappings#smart_cursor_map(
-                \ "\<Plug>(vimfiler_expand_tree)",
-                \ "\<Plug>(vimfiler_edit_file)"
-                \ )
-        else
-          let mapping = vimfiler#mappings#smart_cursor_map(
-                \ "\<Plug>(vimfiler_cd_file)",
-                \ "\<Plug>(vimfiler_edit_file)"
-                \ )
-        endif
-        execute "normal " . mapping
-      endfunction
-    "}}}
-  "}}}
-
-  " unite {{{
-    NeoBundle 'Shougo/unite.vim' "{{{
-      let bundle = neobundle#get('unite.vim')
-      function! bundle.hooks.on_source(bundle)
-        call unite#filters#matcher_default#use(['matcher_fuzzy'])
-        call unite#filters#sorter_default#use(['sorter_rank'])
-        call unite#set_profile('files', 'context.smartcase', 1)
-        call unite#custom#source('line,outline','matchers','matcher_fuzzy')
-      endfunction
-
-      let g:unite_data_directory='~/.vim/cache/unite'
-      let g:unite_enable_start_insert=1
-      let g:unite_source_history_yank_enable=1
-      let g:unite_source_rec_max_cache_files=5000
-      let g:unite_prompt='» '
-      let g:unite_winheight=10
-
-      let g:unite_source_grep_command='ag'
-      let g:unite_source_grep_default_opts='--nocolor --nogroup -S -U'
-      let g:unite_source_grep_recursive_opt=''
-
-      let g:unite_source_buffer_time_format = ''
-
-      function! s:unite_settings()
-        nmap <buffer> Q <plug>(unite_exit)
-        nmap <buffer> <esc> <plug>(unite_exit)
-        imap <buffer> <esc> <plug>(unite_exit)
-        nmap <buffer> <C-U> <plug>(unite_redraw)
-        imap <buffer> <C-U> <plug>(unite_redraw)
-        nmap <buffer> <leader>o <plug>(unite_toggle_auto_preview)
-      endfunction
-      autocmd FileType unite call s:unite_settings()
-
-      nmap <space> [unite]
-      nnoremap [unite] <nop>
-
-      nnoremap <silent> [unite]<space> :<C-u>Unite -toggle -auto-resize -buffer-name=mixed -hide-source-names buffer bookmark file_rec/async:!<cr><c-u>
-      nnoremap <silent> [unite]f :<C-u>Unite -toggle -auto-resize -buffer-name=files file_rec/async:!<cr><c-u>
-      nnoremap <silent> [unite]r :<C-u>Unite -toggle -auto-resize -buffer-name=recent file_mru<cr>
-      nnoremap <silent> [unite]p :<C-u>Unite -toggle -auto-resize -buffer-name=yanks history/yank<cr>
-      nnoremap <silent> [unite]l :<C-u>Unite -toggle -auto-resize -buffer-name=line line<cr>
-      nnoremap <silent> [unite]b :<C-u>Unite -toggle -auto-resize -buffer-name=buffers buffer<cr>
-      nnoremap <silent> [unite]/ :<C-u>Unite -toggle -auto-resize -buffer-name=search -max-multi-lines=0 grep:.<cr>
-      nnoremap <silent> [unite]m :<C-u>Unite -toggle -auto-resize -buffer-name=mappings mapping<cr>
-      nnoremap <silent> [unite]e :<C-u>Unite -toggle -auto-resize resume<cr>
-
-      nnoremap <silent> [unite]q<space> :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=mixed buffer bookmark file_rec/async:!<cr><c-u>
-      nnoremap <silent> [unite]qf :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=files file_rec/async:!<cr><c-u>
-      nnoremap <silent> [unite]qr :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=recent file_mru<cr>
-      nnoremap <silent> [unite]qp :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=yanks history/yank<cr>
-      nnoremap <silent> [unite]ql :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=line line<cr>
-      nnoremap <silent> [unite]qb :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=buffers buffer<cr>
-      nnoremap <silent> [unite]q/ :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=search -max-multi-lines=0 grep:.<cr>
-      nnoremap <silent> [unite]qm :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=mappings mapping<cr>
-      nnoremap <silent> [unite]qe :<C-u>Unite -no-quit -toggle -auto-resize resume<cr>
-
-    "}}}
-    NeoBundleLazy 'Shougo/neomru.vim', {'autoload':{'unite_sources':'file_mru'}}
-    NeoBundleLazy 'tsukkee/unite-tag', {'autoload':{'unite_sources':['tag','tag/file']}} "{{{
-      nnoremap <silent> [unite]t :<C-u>Unite -auto-resize -buffer-name=tag tag tag/file<cr>
-    "}}}
-    NeoBundleLazy 'Shougo/unite-outline', {'autoload':{'unite_sources':'outline'}} "{{{
-      " Tagbar
-      nnoremap <silent> [unite]o :<C-u>Unite -toggle -auto-resize -buffer-name=outline outline<cr>
-      nnoremap <silent> [unite]qo :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=outline outline<cr>
-    "}}}
-    NeoBundleLazy 'Shougo/unite-help', {'autoload':{'unite_sources':'help'}} "{{{
-      nnoremap <silent> [unite]h :<C-u>Unite -auto-resize -buffer-name=help help<cr>
-    "}}}
-  "}}}
-
   " textobj {{{
     NeoBundle 'kana/vim-textobj-user'
     NeoBundle 'kana/vim-textobj-indent'
     NeoBundle 'kana/vim-textobj-entire'
     NeoBundle 'kana/vim-textobj-line'
-    NeoBundle 'lucapette/vim-textobj-underscore'
+    NeoBundle 'bkad/CamelCaseMotion'
     NeoBundle 'nelstrom/vim-textobj-rubyblock'
   "}}}
 
   " misc {{{
     NeoBundle 'henrik/vim-indexed-search'
-    NeoBundle 'thinca/vim-qfreplace'
+    NeoBundle 'skwp/greplace.vim'
     NeoBundle 'scrooloose/syntastic' "{{{
       let g:syntastic_error_symbol = 'e'
       let g:syntastic_style_error_symbol = 'œ'
@@ -475,17 +354,16 @@
 
   call neobundle#end()
 " mappings {{{
+  nmap <leader>b :b<Space>
+  nmap <leader>/ :Gsearch<CR>
   nmap <leader>fef :call Preserve("normal gg=G")<CR>
   nnoremap <leader>ev :split ~/.vim/vimrc<CR>
   nnoremap <leader>sv :source ~/.vimrc<CR>
   nnoremap <leader>h :noh<CR>
   nnoremap <leader>l :set list!<CR>
-  inoremap kj <Esc>
-  inoremap jk <Esc>
   nnoremap <silent> <C-S> :update<CR>
   vnoremap <silent> <C-S> <C-C>:update<CR>
   inoremap <silent> <C-S> <Esc>:update<CR>
-  nmap <leader>f$ :call StripTrailingWhitespace()<CR>
   nnoremap <silent> <C-E> <C-E>j
   nnoremap <silent> <C-Y> <C-Y>k
   nnoremap <silent> <C-H> ^
@@ -510,33 +388,20 @@
   " hide annoying quit message
   nnoremap <C-c> <C-c>:echo<cr>
 
-  " window killer
-  nnoremap <silent> Q :call CloseWindowOrKillBuffer()<cr>
-
   " insert current date
   nnoremap <F6> "=strftime("%Y-%m-%d")<CR>P
   inoremap <F6> <C-R>=strftime("%Y-%m-%d")<CR>
 
-  " zeal integration
-  nnoremap gz :!zeal --query "<cword>"&<CR><CR>
-
   " abbreviations
   iab filed field
   iab thme theme
+  iab resutl result
 
   " show syntax group
   nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
     \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
     \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-
-  " toggle keyword colors
-  nnoremap [k :hi Keyword ctermfg=4<CR>
-  nnoremap ]k :hi Keyword ctermfg=NONE<CR>
   "}}}
-
-autocmd FileType php setlocal shiftwidth=2 tabstop=2
-autocmd FileType php setlocal noexpandtab
-autocmd FileType gitcommit setlocal nonumber norelativenumber
 
 set t_Co=256
 colorscheme my
