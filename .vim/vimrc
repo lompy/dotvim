@@ -344,6 +344,8 @@
 
   " misc {{{
     NeoBundle 'henrik/vim-indexed-search'
+    NeoBundle 'junegunn/vim-pseudocl'
+    NeoBundle 'junegunn/vim-oblique'
     NeoBundle 'scrooloose/syntastic' "{{{
       let g:syntastic_error_symbol = 'e'
       let g:syntastic_style_error_symbol = 'œ'
@@ -360,6 +362,7 @@
 
   call neobundle#end()
 " mappings {{{
+  inoremap kj <Esc>
   nnoremap <leader>b :buffers<CR>:b<Space>
   nnoremap <leader>m :edit .<CR>
   nnoremap <leader>n :Explore<CR>
