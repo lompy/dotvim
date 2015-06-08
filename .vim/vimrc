@@ -146,7 +146,7 @@
   set statusline+=[%n%H%M%R%W]\              "flags and buf no
   set statusline+=%-40f\                     "path
   set statusline+=%=%y\                      "file type
-  set statusline+=%10((%4.l\ /%4.L,%3.c)%)\  "line and column
+  set statusline+=%L:%4.l,%3.c\  "line and column
   set statusline+=%P                         "percentage of file
 
   " Autocmd
@@ -178,7 +178,7 @@
     autocmd FileType gitcommit setlocal spell
 
     " Allow stylesheets to autocomplete hyphenated words
-    autocmd FileType css,scss,sass setlocal iskeyword+=-
+    autocmd FileType css,scss,sass,styl setlocal iskeyword+=-
 
     autocmd BufNewFile,BufRead *.hamlc setfiletype haml
     autocmd FileType php setlocal shiftwidth=2 tabstop=2
@@ -188,22 +188,7 @@
 
   " Make the 81st column stand out by Damian Conway
   highlight ColorColumn ctermbg=red
-
-  function! MarkMargin ()
-    if exists('b:MarkMargin')
-      try
-        call matchdelete(b:MarkMargin)
-      catch /./
-      endtry
-      unlet b:MarkMargin
-    endif
-    let b:MarkMargin = matchadd('ColorColumn', '\%81v', 100)
-  endfunction
-
-  augroup MarkMargin
-      autocmd!
-      autocmd  BufEnter  * :call MarkMargin()
-  augroup END
+  call matchadd('ColorColumn', '\%81v', 100)
 "}}}
 
 " plugin/mapping configuration {{{
@@ -298,40 +283,6 @@
         \ 'windows': '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\nmake.exe" make_msvc32.mak',
       \ },
     \ }
-    NeoBundle 'Shougo/unite.vim' "{{{
-      let bundle = neobundle#get('unite.vim')
-      function! bundle.hooks.on_source(bundle)
-        call unite#filters#matcher_default#use(['matcher_fuzzy'])
-        call unite#filters#sorter_default#use(['sorter_rank'])
-        call unite#set_profile('files', 'context.smartcase', 1)
-        call unite#custom#source('line,outline','matchers','matcher_fuzzy')
-      endfunction
-
-      let g:unite_data_directory='~/.vim/cache/unite'
-      let g:unite_source_history_yank_enable=1
-      let g:unite_source_rec_max_cache_files=5000
-      let g:unite_prompt=':'
-      let g:unite_winheight=10
-
-      let g:unite_source_grep_command='ag'
-      let g:unite_source_grep_default_opts='--nocolor --nogroup -S -U'
-      let g:unite_source_grep_recursive_opt=''
-
-      let g:unite_source_buffer_time_format = ''
-
-      function! s:unite_settings()
-        nmap <buffer> Q <plug>(unite_exit)
-        nmap <buffer> <esc> <plug>(unite_exit)
-        imap <buffer> <esc> <plug>(unite_exit)
-        nmap <buffer> <C-U> <plug>(unite_redraw)
-        imap <buffer> <C-U> <plug>(unite_redraw)
-      endfunction
-      autocmd FileType unite call s:unite_settings()
-
-      nnoremap <silent> <Leader>p :<C-u>Unite -toggle -auto-resize -buffer-name=yanks history/yank<cr>
-      nnoremap <silent> <Leader>/ :<C-u>Unite -toggle -auto-resize -buffer-name=search -max-multi-lines=0 grep:.<cr>
-      nnoremap <silent> <Leader>qp :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=yanks history/yank<cr>
-      nnoremap <silent> <Leader>q/ :<C-u>Unite -no-quit -toggle -auto-resize -buffer-name=search -max-multi-lines=0 grep:.<cr>
 
   " textobj {{{
     NeoBundle 'kana/vim-textobj-user'
@@ -344,8 +295,30 @@
 
   " misc {{{
     NeoBundle 'henrik/vim-indexed-search'
-    NeoBundle 'junegunn/vim-pseudocl'
-    NeoBundle 'junegunn/vim-oblique'
+    NeoBundle 'junegunn/fzf' "{{{
+      function! s:ag_handler(lines)
+        if len(a:lines) < 2 | return | endif
+
+        let [key, line] = a:lines[0:1]
+        let [file, line, col] = split(line, ':')[0:2]
+        let cmd = get({'ctrl-x': 'split', 'ctrl-v': 'vertical split', 'ctrl-t': 'tabe'}, key, 'e')
+        execute cmd escape(file, ' %#\')
+        execute line
+        execute 'normal!' col.'|zz'
+        for line in a:lines
+          echo 'bla'
+          echo line
+        endfor
+      endfunction
+
+      command! -nargs=1 Ag call fzf#run({
+      \ 'source':  'ag --nogroup --column --color "'.escape(<q-args>, '"\').'"',
+      \ 'sink*':    function('<sid>ag_handler'),
+      \ 'options': '--ansi --expect=ctrl-t,ctrl-v,ctrl-x --multi',
+      \ 'down':    '50%'
+      \ })
+    "}}}
+    NeoBundle 'christoomey/vim-tmux-navigator'
     NeoBundle 'scrooloose/syntastic' "{{{
       let g:syntastic_error_symbol = 'e'
       let g:syntastic_style_error_symbol = 'œ'
@@ -353,10 +326,6 @@
       let g:syntastic_style_warning_symbol = '≈'
     "}}}
     NeoBundle 'malkomalko/projections.vim'
-  "}}}
-
-  " color schemes {{{
-    NeoBundle 'altercation/vim-colors-solarized'
   "}}}
 "}}}
 

@@ -1,8 +1,3 @@
-" Vim color file
-" Converted from Textmate theme Espresso Soda using Coloration v0.3.2 (http://github.com/sickill/coloration)
-" Edited a bit from @DAddYE's hands
-" Repo: https://github.com/DAddYE/soda.vim
-
 set background=light
 highlight clear
 
