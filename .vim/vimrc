@@ -299,17 +299,21 @@
     NeoBundle 'junegunn/fzf' "{{{
       function! s:ag_handler(lines)
         if len(a:lines) < 2 | return | endif
-
-        let [key, line] = a:lines[0:1]
-        let [file, line, col] = split(line, ':')[0:2]
-        let cmd = get({'ctrl-x': 'split', 'ctrl-v': 'vertical split', 'ctrl-t': 'tabe'}, key, 'e')
-        execute cmd escape(file, ' %#\')
-        execute line
-        execute 'normal!' col.'|zz'
-        for line in a:lines
-          echo 'bla'
-          echo line
-        endfor
+        if len(a:lines) == 3
+          let [key, line] = a:lines[0:1]
+          let [file, line, col] = split(line, ':')[0:2]
+          let cmd = get({'ctrl-x': 'split', 'ctrl-v': 'vertical split', 'ctrl-t': 'tabe'}, key, 'e')
+          execute cmd escape(file, ' %#\')
+          execute line
+          execute 'normal!' col.'|zz'
+          return
+        else
+          for line in a:lines
+            echo 'bla'
+            echo line
+          endfor
+          return
+        endif
       endfunction
 
       command! -nargs=1 Ag call fzf#run({
