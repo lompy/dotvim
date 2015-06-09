@@ -227,6 +227,7 @@
     NeoBundleLazy 'tpope/vim-bundler', {'autoload':{'filetypes':['ruby']}}
     NeoBundleLazy 'tpope/vim-rake', {'autoload':{'filetypes':['ruby']}}
     NeoBundleLazy 'thoughtbot/vim-rspec', {'autoload':{'filetypes':['ruby']}} "{{{
+      let g:rspec_command = "call VtrSendCommand('rspec {spec}')"
       map <Leader>rf :call RunCurrentSpecFile()<CR>
       map <Leader>rc :call RunNearestSpec()<CR>
       map <Leader>rl :call RunLastSpec()<CR>
@@ -319,6 +320,7 @@
       \ })
     "}}}
     NeoBundle 'christoomey/vim-tmux-navigator'
+    NeoBundle 'christoomey/vim-tmux-runner'
     NeoBundle 'scrooloose/syntastic' "{{{
       let g:syntastic_error_symbol = 'e'
       let g:syntastic_style_error_symbol = 'œ'
