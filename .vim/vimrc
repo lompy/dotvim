@@ -143,11 +143,12 @@
   set fillchars+=vert:\                      "whitespace instead of | as vertical delimiter
 
   set statusline=
-  set statusline+=[%n%H%M%R%W]\              "flags and buf no
-  set statusline+=%-40f\                     "path
-  set statusline+=%=%y\                      "file type
-  set statusline+=%L:%4.l,%3.c\  "line and column
-  set statusline+=%P                         "percentage of file
+  set statusline+=[%n%H%M%R%W]\                "flags and buf no
+  set statusline+=%-40f\                       "path
+  set statusline+=%=%{fugitive#statusline()}   "git status
+  set statusline+=%y\                          "file type
+  set statusline+=%L:%4.l,%3.c\                "line and column
+  set statusline+=%P                           "percentage of file
 
   " Autocmd
   augroup vimrcEx
@@ -323,7 +324,6 @@
       \ 'down':    '50%'
       \ })
     "}}}
-    NeoBundle 'christoomey/vim-tmux-navigator'
     NeoBundle 'christoomey/vim-tmux-runner'
     NeoBundle 'scrooloose/syntastic' "{{{
       let g:syntastic_error_symbol = 'e'
@@ -387,9 +387,8 @@
     map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" . " FG:" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"fg#")<CR>
   "}}}
 
-set t_Co=256
-colorscheme my
-
 filetype plugin indent on
 syntax enable
 filetype plugin on
+
+colorscheme my
