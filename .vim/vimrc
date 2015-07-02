@@ -1,391 +1,410 @@
-  " NeoBundle init {{{
-  if has('vim_starting')
-    set nocompatible
-    set runtimepath+=~/.vim/bundle/neobundle.vim/
+" NeoBundle init {{{
+if has('vim_starting')
+  set nocompatible
+  set runtimepath+=~/.vim/bundle/neobundle.vim/
+endif
+call neobundle#begin(expand('~/.vim/bundle/'))
+NeoBundleFetch 'Shougo/neobundle.vim'
+NeoBundleCheck
+NeoBundleDocs
+"}}}
+
+" functions {{{ "
+
+function! Preserve(command) "{{{
+  " preparation: save last search, and cursor position.
+  let _s=@/
+  let l = line(".")
+  let c = col(".")
+  " do the busine:
+  execute a:command
+  " clean up: restore previous search history, and cursor position
+  let @/=_s
+  call cursor(l, c)
+endfunction "}}}
+function! StripTrailingWhitespace() "{{{
+  call Preserve("%s/\\s\\+$//e")
+endfunction "}}}
+function! EnsureExists(path) "{{{
+  if !isdirectory(expand(a:path))
+    call mkdir(expand(a:path))
   endif
-  call neobundle#begin(expand('~/.vim/bundle/'))
-  NeoBundleFetch 'Shougo/neobundle.vim'
-  NeoBundleCheck
-  "}}}
+endfunction "}}}
 
-  " functions {{{
-  "
+function! MyFoldText() " {{{
+  let line = getline(v:foldstart)
 
-  function! Preserve(command) "{{{
-    " preparation: save last search, and cursor position.
-    let _s=@/
-    let l = line(".")
-    let c = col(".")
-    " do the busine:
-    execute a:command
-    " clean up: restore previous search history, and cursor position
-    let @/=_s
-    call cursor(l, c)
-  endfunction "}}}
-  function! StripTrailingWhitespace() "{{{
-    call Preserve("%s/\\s\\+$//e")
-  endfunction "}}}
-  function! EnsureExists(path) "{{{
-    if !isdirectory(expand(a:path))
-      call mkdir(expand(a:path))
-    endif
-  endfunction "}}}
+  let nucolwidth = &fdc + &number * &numberwidth
+  let windowwidth = winwidth(0) - nucolwidth - 3
+  let foldedlinecount = v:foldend - v:foldstart
 
-  function! MyFoldText() " {{{
-    let line = getline(v:foldstart)
+  " expand tabs into spaces
+  let onetab = strpart('          ', 0, &tabstop)
+  let line = substitute(line, '\t', onetab, 'g')
 
-    let nucolwidth = &fdc + &number * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 3
-    let foldedlinecount = v:foldend - v:foldstart
+  let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+  let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+  return line . ' … ('. foldedlinecount . ')' . repeat(" ",fillcharcount)
+endfunction " }}}
 
-    " expand tabs into spaces
-    let onetab = strpart('          ', 0, &tabstop)
-    let line = substitute(line, '\t', onetab, 'g')
+"}}}
 
-    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-    return line . ' … ('. foldedlinecount . ')' . repeat(" ",fillcharcount)
-  endfunction " }}}
+" base configuration {{{
+set foldtext=MyFoldText()                           "pretty folding
+set timeoutlen=500                                  "mapping timeout
+set ttimeoutlen=50                                  "keycode timeout
 
-  "}}}
+set mouse=a                                         "enable mouse
+set mousehide                                       "hide when characters are typed
+set history=1000                                    "number of command lines to remember
+set ttyfast                                         "assume fast terminal connection
+set viewoptions=folds,options,cursor,unix,slash     "unix/windows compatibility
+set encoding=utf-8                                  "set encoding for text
+set hidden                                          "allow buffer switching without saving
+set autoread                                        "auto reload if file saved externally
+set fileformats+=mac                                "add mac to auto-detection of file format line endings
+set nrformats-=octal                                "always assume decimal numbers
+set showcmd
+set showfulltag
+set modeline
+set modelines=5
 
-  " base configuration {{{
-  set foldtext=MyFoldText()                           "pretty folding
-  set timeoutlen=500                                  "mapping timeout
-  set ttimeoutlen=50                                  "keycode timeout
+" whitespace
+set backspace=2                                     ":set backspace=indent,eol,start
+set autoindent                                      "automatically indent to match adjacent lines
+set expandtab                                       "spaces instead of tabs
+set smarttab                                        "use shiftwidth to enter tabs
+let &tabstop=2                                      "number of spaces per tab for display
+let &softtabstop=2                                  "number of spaces per tab in insert mode
+let &shiftwidth=2                                   "number of spaces when indenting
+set nolist                                          "highlight whitespace
+set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
+set shiftround
+set linebreak
+let &showbreak=' ↪ '
+set scrolloff=1                                     "always show content after scroll
+set scrolljump=5                                    "minimum number of lines to scroll
+set display+=lastline
 
-  set mouse=a                                         "enable mouse
-  set mousehide                                       "hide when characters are typed
-  set history=1000                                    "number of command lines to remember
-  set ttyfast                                         "assume fast terminal connection
-  set viewoptions=folds,options,cursor,unix,slash     "unix/windows compatibility
-  set encoding=utf-8                                  "set encoding for text
-  set hidden                                          "allow buffer switching without saving
-  set autoread                                        "auto reload if file saved externally
-  set fileformats+=mac                                "add mac to auto-detection of file format line endings
-  set nrformats-=octal                                "always assume decimal numbers
-  set showcmd
-  set showfulltag
-  set modeline
-  set modelines=5
+set splitbelow
+set splitright
 
-  " whitespace
-  set backspace=2                                     ":set backspace=indent,eol,start
-  set autoindent                                      "automatically indent to match adjacent lines
-  set expandtab                                       "spaces instead of tabs
-  set smarttab                                        "use shiftwidth to enter tabs
-  let &tabstop=2                                      "number of spaces per tab for display
-  let &softtabstop=2                                  "number of spaces per tab in insert mode
-  let &shiftwidth=2                                   "number of spaces when indenting
-  set nolist                                          "highlight whitespace
-  set listchars=tab:│\ ,trail:•,extends:❯,precedes:❮
-  set shiftround
-  set linebreak
-  let &showbreak=' ↪ '
-  set scrolloff=1                                     "always show content after scroll
-  set scrolljump=5                                    "minimum number of lines to scroll
-  set display+=lastline
+" disable sounds
+set noerrorbells
+set novisualbell
+set t_vb=
 
-  set splitbelow
-  set splitright
+" searching
+set hlsearch                                        "highlight searches
+set incsearch                                       "incremental searching
+set ignorecase                                      "ignore case for searching
+set smartcase                                       "do case-sensitive if there's a capital letter
+set grepprg=ag
+set grepprg=ag\ --nogroup\ --nocolor
+set grepformat=%f:%l:%c:%m
 
-  " disable sounds
-  set noerrorbells
-  set novisualbell
-  set t_vb=
+" vim file/folder management {{{
+  " persistent undo
+  set undofile
+  set undodir=~/.vim/cache/undo
 
-  " searching
-  set hlsearch                                        "highlight searches
-  set incsearch                                       "incremental searching
-  set ignorecase                                      "ignore case for searching
-  set smartcase                                       "do case-sensitive if there's a capital letter
-  set grepprg=ag
-  set grepprg=ag\ --nogroup\ --nocolor
-  set grepformat=%f:%l:%c:%m
+  " backups
+  set backup
+  set backupdir=~/.vim/cache/backup
 
-  " vim file/folder management {{{
-    " persistent undo
-    set undofile
-    set undodir=~/.vim/cache/undo
+  " swap files
+  set directory=~/.vim/cache/swap
+  set noswapfile
 
-    " backups
-    set backup
-    set backupdir=~/.vim/cache/backup
+  call EnsureExists('~/.vim/cache')
+  call EnsureExists(&undodir)
+  call EnsureExists(&backupdir)
+  call EnsureExists(&directory)
+"}}}
 
-    " swap files
-    set directory=~/.vim/cache/swap
-    set noswapfile
-
-    call EnsureExists('~/.vim/cache')
-    call EnsureExists(&undodir)
-    call EnsureExists(&backupdir)
-    call EnsureExists(&directory)
-  "}}}
-
-  let mapleader = " "
-  let g:mapleader = " "
+let mapleader = " "
+let g:mapleader = " "
 "}}}
 
 " ui configuration {{{
-  set showmatch                                       "automatically highlight matching braces/brackets/etc.
-  set matchtime=2                                     "tens of a second to show matching parentheses
-  set number
-  set relativenumber
-  set lazyredraw
-  set laststatus=2
-  set foldenable                                      "enable folds by default
-  set foldmethod=syntax                               "fold via syntax of files
-  set foldlevelstart=99                               "open all folds by default
-  let g:xml_syntax_folding=1                          "enable xml folding
+set showmatch                                       "automatically highlight matching braces/brackets/etc.
+set matchtime=2                                     "tens of a second to show matching parentheses
+set number
+set relativenumber
+set lazyredraw
+set laststatus=2
+set foldenable                                      "enable folds by default
+set foldmethod=syntax                               "fold via syntax of files
+set foldlevelstart=99                               "open all folds by default
+let g:xml_syntax_folding=1                          "enable xml folding
 
-  set nocursorline
+set nocursorline
 
-  set fillchars+=vert:\                      "whitespace instead of | as vertical delimiter
+set fillchars+=vert:\                      "whitespace instead of | as vertical delimiter
 
-  set statusline=
-  set statusline+=[%n%H%M%R%W]\                "flags and buf no
-  set statusline+=%-40f\                       "path
-  set statusline+=%=%{fugitive#statusline()}   "git status
-  set statusline+=%y\                          "file type
-  set statusline+=%L:%4.l,%3.c\                "line and column
-  set statusline+=%P                           "percentage of file
+set statusline=
+set statusline+=[%n%H%M%R%W]\                "flags and buf no
+set statusline+=%-40f\                       "path
+set statusline+=%=%{fugitive#statusline()}   "git status
+set statusline+=%y\                          "file type
+set statusline+=%L:%4.l,%3.c\                "line and column
+set statusline+=%P                           "percentage of file
 
-  " Autocmd
-  augroup vimrcEx
-    autocmd!
+" Autocmd
+augroup vimrcEx
+  autocmd!
 
-    autocmd BufWritePre * :call StripTrailingWhitespace()
-    autocmd BufRead,BufNewFile *.tpl,*tmpl set filetype=smarty
+  autocmd BufWritePre * :call StripTrailingWhitespace()
+  autocmd BufRead,BufNewFile *.tpl,*tmpl set filetype=smarty
 
-    " When editing a file, always jump to the last known cursor position.
-    " Don't do it for commit messages, when the position is invalid, or when
-    " inside an event handler (happens when dropping a file on gvim).
-    autocmd BufReadPost *
-      \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
-      \   exe "normal g`\"" |
-      \ endif
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it for commit messages, when the position is invalid, or when
+  " inside an event handler (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
 
-    " Set syntax highlighting for specific file types
-    autocmd BufRead,BufNewFile *.md set filetype=markdown
+  " Set syntax highlighting for specific file types
+  autocmd BufRead,BufNewFile *.md set filetype=markdown
 
-    " Enable spellchecking for Markdown
-    autocmd FileType markdown setlocal spell
+  " Enable spellchecking for Markdown
+  autocmd FileType markdown setlocal spell
 
-    " Automatically wrap at 80 characters for Markdown
-    autocmd BufRead,BufNewFile markdown setlocal textwidth=80
+  " Automatically wrap at 80 characters for Markdown
+  autocmd BufRead,BufNewFile markdown setlocal textwidth=80
 
-    " Automatically wrap at 72 characters and spell check git commit messages
-    autocmd FileType gitcommit setlocal textwidth=72
-    autocmd FileType gitcommit setlocal spell
+  " Automatically wrap at 72 characters and spell check git commit messages
+  autocmd FileType gitcommit setlocal textwidth=72
+  autocmd FileType gitcommit setlocal spell
 
-    " Allow stylesheets to autocomplete hyphenated words
-    autocmd FileType css,scss,sass,styl setlocal iskeyword+=-
+  " Allow stylesheets to autocomplete hyphenated words
+  autocmd FileType css,scss,sass,styl setlocal iskeyword+=-
 
-    autocmd BufNewFile,BufRead *.hamlc setfiletype haml
-    autocmd FileType php setlocal shiftwidth=2 tabstop=2
-    autocmd FileType php setlocal noexpandtab
-    autocmd FileType gitcommit setlocal nonumber norelativenumber
-  augroup END
+  autocmd BufNewFile,BufRead *.hamlc setfiletype haml
+  autocmd FileType php setlocal shiftwidth=2 tabstop=2
+  autocmd FileType php setlocal noexpandtab
+  autocmd FileType gitcommit setlocal nonumber norelativenumber
+augroup END
 
-  " Make the 81st column stand out by Damian Conway
-  highlight ColorColumn ctermbg=red
-  call matchadd('ColorColumn', '\%81v', 100)
+" Make the 81st column stand out by Damian Conway
+highlight ColorColumn ctermbg=red
+call matchadd('ColorColumn', '\%81v', 100)
 "}}}
 
 " plugin/mapping configuration {{{
-  " core {{{
-    NeoBundle 'matchit.zip'
-    NeoBundle 'tpope/vim-surround'
-    NeoBundle 'tpope/vim-repeat'
-    NeoBundle 'tpope/vim-eunuch'
-    NeoBundle 'tpope/vim-unimpaired'
-    NeoBundle 'tpope/vim-vinegar'
+" core {{{
+  NeoBundle 'matchit.zip'
+  NeoBundle 'tpope/vim-surround'
+  NeoBundle 'tpope/vim-repeat'
+  NeoBundle 'tpope/vim-eunuch'
+  NeoBundle 'tpope/vim-unimpaired'
+  NeoBundle 'tpope/vim-vinegar'
+"}}}
+
+" web {{{
+  NeoBundleLazy 'tpope/vim-markdown', {'autoload':{'filetypes':['markdown']}} "{{{
+    au BufNewFile,BufRead *.md,*.note  setf markdown
+    let g:markdown_fenced_languages = ['css', 'erb=eruby', 'javascript', 'js=javascript', 'json=javascript', 'ruby', 'sass', 'xml']
   "}}}
+  NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
+  NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
+  NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
+  NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty']}} "{{{
+"}}}
 
-  " web {{{
-    NeoBundleLazy 'tpope/vim-markdown', {'autoload':{'filetypes':['markdown']}} "{{{
-      au BufNewFile,BufRead *.md,*.note  setf markdown
-      let g:markdown_fenced_languages = ['css', 'erb=eruby', 'javascript', 'js=javascript', 'json=javascript', 'ruby', 'sass', 'xml']
-    "}}}
-    NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
-    NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
-    NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
-    NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty']}} "{{{
+" javascript {{{
+  NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
+  NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}} "{{{
+    nnoremap <leader>fjs :call JsBeautify()<cr>
   "}}}
+  NeoBundleLazy 'kchmck/vim-coffee-script', {'autoload':{'filetypes':['coffee']}}
+  NeoBundleLazy 'moll/vim-node', {'autoload':{'filetypes':['javascript', 'coffee']}}
+"}}}
 
-  " javascript {{{
-    NeoBundleLazy 'pangloss/vim-javascript', {'autoload':{'filetypes':['javascript']}}
-    NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}} "{{{
-      nnoremap <leader>fjs :call JsBeautify()<cr>
-    "}}}
-    NeoBundleLazy 'kchmck/vim-coffee-script', {'autoload':{'filetypes':['coffee']}}
-    NeoBundleLazy 'moll/vim-node', {'autoload':{'filetypes':['javascript', 'coffee']}}
-  "}}}
-
-  " ruby {{{
-    NeoBundleLazy 'vim-ruby/vim-ruby', {'autoload':{'filetypes':['ruby']}}
-    NeoBundleLazy 'tpope/vim-rails', {'autoload':{'filetypes':['ruby']}}
-    NeoBundleLazy 'tpope/vim-bundler', {'autoload':{'filetypes':['ruby']}}
-    NeoBundleLazy 'tpope/vim-rake', {'autoload':{'filetypes':['ruby']}}
-    NeoBundleLazy 'thoughtbot/vim-rspec', {'autoload':{'filetypes':['ruby']}} "{{{
-      let g:rspec_command = "call VtrSendCommand('rspec {spec}')"
-      map <Leader>rf :call RunCurrentSpecFile()<CR>
-      map <Leader>rc :call RunNearestSpec()<CR>
-      map <Leader>rl :call RunLastSpec()<CR>
-      map <Leader>ra :call RunAllSpecs()<CR>
-    "}}}
-  "}}}
-
-  " scm {{{
-    NeoBundle 'tpope/vim-fugitive' "{{{
-      nnoremap <silent> <leader>gb :Gblame<CR>
-    "}}}
-  "}}}
-
-  " autocomplete {{{
-    NeoBundle 'Shougo/neosnippet-snippets'
-    NeoBundle 'Shougo/neosnippet.vim' "{{{
-      let g:neosnippet#snippets_directory='~/.vim/snippets'
-      imap <C-k> <Plug>(neosnippet_expand_or_jump)
-      smap <C-k> <Plug>(neosnippet_expand_or_jump)
-      xmap <C-k> <Plug>(neosnippet_expand_target)
-      vmap <C-k> <Plug>(neosnippet_expand_target)
-    "}}}
-    NeoBundleLazy 'Shougo/neocomplete.vim', {'autoload':{'insert':1}, 'vim_version':'7.3.885'} "{{{
-      let g:neocomplete#enable_at_startup=1
-      let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
-      let g:neocomplete#force_overwrite_completefunc = 1
-      let g:neocomplete#max_list = 4
-      let g:neocomplete#auto_completion_start_length = 3
-      let g:neocomplete#enable_smart_case = 1
-      inoremap <expr><C-N>  neocomplete#start_manual_complete()
-    "}}}
-  "}}}
-
-
-  " editing {{{
-    NeoBundle 'tpope/vim-endwise'
-    NeoBundle 'tpope/vim-abolish'
-    NeoBundle 'tpope/vim-speeddating'
-    NeoBundle 'tpope/vim-commentary'
-    NeoBundle 'tommcdo/vim-lion'
-    " NeoBundle 'justinmk/vim-sneak' "{{{
-    "   let g:sneak#streak = 0
-    "   let g:sneak#use_ic_scs = 1
-    " "}}}
-  "}}}
-
-  " unite for global search/replace and yank ring
-    NeoBundle 'thinca/vim-qfreplace'
-    NeoBundle 'Shougo/vimproc.vim', {
-      \ 'build': {
-        \ 'mac': 'make -f make_mac.mak',
-        \ 'unix': 'make -f make_unix.mak',
-        \ 'cygwin': 'make -f make_cygwin.mak',
-        \ 'windows': '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\nmake.exe" make_msvc32.mak',
-      \ },
-    \ }
-
-  " textobj {{{
-    NeoBundle 'kana/vim-textobj-user'
-    NeoBundle 'kana/vim-textobj-indent'
-    NeoBundle 'kana/vim-textobj-entire'
-    NeoBundle 'kana/vim-textobj-line'
-    NeoBundle 'nelstrom/vim-textobj-rubyblock'
-    NeoBundle 'bkad/CamelCaseMotion'
-  "}}}
-
-  " misc {{{
-    NeoBundle 'henrik/vim-indexed-search'
-    NeoBundle 'junegunn/fzf' "{{{
-      function! s:ag_handler(lines)
-        if len(a:lines) < 2 | return | endif
-        if len(a:lines) == 3
-          let [key, line] = a:lines[0:1]
-          let [file, line, col] = split(line, ':')[0:2]
-          let cmd = get({'ctrl-x': 'split', 'ctrl-v': 'vertical split', 'ctrl-t': 'tabe'}, key, 'e')
-          execute cmd escape(file, ' %#\')
-          execute line
-          execute 'normal!' col.'|zz'
-          return
-        else
-          for line in a:lines
-            echo 'bla'
-            echo line
-          endfor
-          return
-        endif
-      endfunction
-
-      command! -nargs=1 Ag call fzf#run({
-      \ 'source':  'ag --nogroup --column --color "'.escape(<q-args>, '"\').'"',
-      \ 'sink*':    function('<sid>ag_handler'),
-      \ 'options': '--ansi --expect=ctrl-t,ctrl-v,ctrl-x --multi',
-      \ 'down':    '50%'
-      \ })
-    "}}}
-    NeoBundle 'christoomey/vim-tmux-runner'
-    NeoBundle 'scrooloose/syntastic' "{{{
-      let g:syntastic_error_symbol = 'e'
-      let g:syntastic_style_error_symbol = 'œ'
-      let g:syntastic_warning_symbol = 'w'
-      let g:syntastic_style_warning_symbol = '≈'
-    "}}}
-    NeoBundle 'malkomalko/projections.vim'
+" ruby {{{
+  NeoBundleLazy 'vim-ruby/vim-ruby', {'autoload':{'filetypes':['ruby']}}
+  NeoBundleLazy 'tpope/vim-rails', {'autoload':{'filetypes':['ruby']}}
+  NeoBundleLazy 'tpope/vim-bundler', {'autoload':{'filetypes':['ruby']}}
+  NeoBundleLazy 'tpope/vim-rake', {'autoload':{'filetypes':['ruby']}}
+  NeoBundleLazy 'thoughtbot/vim-rspec', {'autoload':{'filetypes':['ruby']}} "{{{
+    let g:rspec_command = "call VtrSendCommand('rspec {spec}')"
+    map <Leader>rf :call RunCurrentSpecFile()<CR>
+    map <Leader>rc :call RunNearestSpec()<CR>
+    map <Leader>rl :call RunLastSpec()<CR>
+    map <Leader>ra :call RunAllSpecs()<CR>
   "}}}
 "}}}
 
-  call neobundle#end()
-" mappings {{{
-  inoremap kj <Esc>
-  nnoremap <leader>b :buffers<CR>:b<Space>
-  nnoremap <leader>m :edit .<CR>
-  nnoremap <leader>n :Explore<CR>
-  nnoremap <leader>d :bd<CR>
-  nnoremap <leader>fef :call Preserve("normal gg=G")<CR>
-  nnoremap <leader>ev :split ~/.vim/vimrc<CR>
-  nnoremap <leader>sv :source ~/.vimrc<CR>
-  nnoremap <leader>h :noh<CR>
-  nnoremap <leader>l :set list!<CR>
-  nnoremap <silent> <C-S> :update<CR>
-  vnoremap <silent> <C-S> <C-C>:update<CR>
-  inoremap <silent> <C-S> <Esc>:update<CR>
-  nnoremap <silent> <C-E> <C-E>j
-  nnoremap <silent> <C-Y> <C-Y>k
-  nnoremap <silent> <C-H> ^
-  nnoremap <silent> <C-L> $
-
-  " command-line window {{{
-    nnoremap q: q:i
-    nnoremap q/ q/i
-    nnoremap q? q?i
-  " }}}
-
-  " folds {{{
-    nnoremap zr zr:echo &foldlevel<cr>
-    nnoremap zm zm:echo &foldlevel<cr>
-    nnoremap zR zR:echo &foldlevel<cr>
-    nnoremap zM zM:echo &foldlevel<cr>
-  " }}}
-
-  " make Y consistent with C and D. See :help Y.
-  nnoremap Y y$
-
-  " hide annoying quit message
-  nnoremap <C-c> <C-c>:echo<cr>
-
-  " insert current date
-  nnoremap <F6> "=strftime("%Y-%m-%d")<CR>P
-  inoremap <F6> <C-R>=strftime("%Y-%m-%d")<CR>
-
-  " abbreviations
-  iab filed field
-  iab thme theme
-  iab resutl result
-
-  " show syntax group
-    map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" . " FG:" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"fg#")<CR>
+" scm {{{
+  NeoBundle 'tpope/vim-fugitive' "{{{
+    nnoremap <silent> <leader>gb :Gblame<CR>
   "}}}
+"}}}
+
+" autocomplete {{{
+  NeoBundle 'Shougo/neosnippet-snippets'
+  NeoBundle 'Shougo/neosnippet.vim' "{{{
+    let g:neosnippet#snippets_directory='~/.vim/snippets'
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xmap <C-k> <Plug>(neosnippet_expand_target)
+    vmap <C-k> <Plug>(neosnippet_expand_target)
+  "}}}
+  NeoBundleLazy 'Shougo/neocomplete.vim', {'autoload':{'insert':1}, 'vim_version':'7.3.885'} "{{{
+    let g:neocomplete#enable_at_startup=1
+    let g:neocomplete#data_directory='~/.vim/cache/neocomplete'
+    let g:neocomplete#force_overwrite_completefunc = 1
+    let g:neocomplete#max_list = 4
+    let g:neocomplete#auto_completion_start_length = 3
+    let g:neocomplete#enable_smart_case = 1
+    inoremap <expr><C-N>  neocomplete#start_manual_complete()
+  "}}}
+"}}}
+
+
+" editing {{{
+  NeoBundle 'tpope/vim-endwise'
+  NeoBundle 'tpope/vim-abolish'
+  NeoBundle 'tpope/vim-speeddating'
+  NeoBundle 'tpope/vim-commentary'
+  NeoBundle 'tommcdo/vim-lion'
+  " NeoBundle 'justinmk/vim-sneak' "{{{
+  "   let g:sneak#streak = 0
+  "   let g:sneak#use_ic_scs = 1
+  " "}}}
+"}}}
+
+  NeoBundle 'thinca/vim-qfreplace'
+  NeoBundle 'Shougo/vimproc.vim', {
+    \ 'build': {
+      \ 'mac': 'make -f make_mac.mak',
+      \ 'unix': 'make -f make_unix.mak',
+      \ 'cygwin': 'make -f make_cygwin.mak',
+      \ 'windows': '"C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\nmake.exe" make_msvc32.mak',
+    \ },
+  \ }
+
+" textobj {{{
+  NeoBundle 'kana/vim-textobj-user'
+  NeoBundle 'kana/vim-textobj-indent'
+  NeoBundle 'kana/vim-textobj-entire'
+  NeoBundle 'kana/vim-textobj-line'
+  NeoBundle 'nelstrom/vim-textobj-rubyblock'
+  NeoBundle 'bkad/CamelCaseMotion'
+"}}}
+
+" misc {{{
+  NeoBundle 'henrik/vim-indexed-search'
+  NeoBundle 'junegunn/fzf' "{{{
+    function! s:ag_handler(lines)
+      if len(a:lines) < 2 | return | endif
+      if len(a:lines) == 2
+        let [key, line] = a:lines[0:1]
+        let [file, line, col] = split(line, ':')[0:2]
+        let cmd = get({'ctrl-x': 'split', 'ctrl-v': 'vertical split'}, key, 'e')
+        execute cmd escape(file, ' %#\')
+        execute line
+        execute 'normal!' col.'|zz'
+        return
+      else
+        let filenames = {}
+        for line in a:lines
+          let split_line = split(line, ':')[0:2]
+          if len(split_line) > 0
+            let [file, line, col] = split_line[0:2]
+            let filenames[file] = 1
+          endif
+        endfor
+        let files = keys(filenames)
+        execute 'tabnew'
+        execute 'arglocal '.join(files)
+        return
+      endif
+    endfunction
+
+    command! -nargs=1 Ag call fzf#run({
+    \ 'source':  'ag --nogroup --column --nocolor "'.escape(<q-args>, '"\').'"',
+    \ 'sink*':    function('<sid>ag_handler'),
+    \ 'options': '--ansi --expect=ctrl-v,ctrl-x --multi',
+    \ 'down':    '50%'
+    \ })
+
+    command! -nargs=1 Agi call fzf#run({
+    \ 'source':  'ag -i --nogroup --column --nocolor "'.escape(<q-args>, '"\').'"',
+    \ 'sink*':    function('<sid>ag_handler'),
+    \ 'options': '--ansi --expect=ctrl-v,ctrl-x --multi',
+    \ 'down':    '50%'
+    \ })
+
+    command! -bar FZFTags if !empty(tagfiles()) | call fzf#run({
+    \   'source': "sed '/^\\!/d;s/\t.*//' " . join(tagfiles()) . ' | uniq',
+    \   'sink':   'tag',
+    \ }) | else | echo 'no tags file' | endif
+    " \ }) | else | echo 'Preparing tags' | call system('ctags -R') | FZFTag | endif
+  "}}}
+  NeoBundle 'christoomey/vim-tmux-runner'
+  NeoBundle 'scrooloose/syntastic' "{{{
+    let g:syntastic_error_symbol = 'e'
+    let g:syntastic_style_error_symbol = 'œ'
+    let g:syntastic_warning_symbol = 'w'
+    let g:syntastic_style_warning_symbol = '≈'
+  "}}}
+  NeoBundle 'malkomalko/projections.vim'
+"}}}
+"}}}
+
+call neobundle#end()
+" mappings {{{
+inoremap kj <Esc>
+nnoremap <leader>b :buffers<CR>:b<Space>
+nnoremap <leader>m :edit .<CR>
+nnoremap <leader>n :Explore<CR>
+nnoremap <leader>d :bd<CR>
+nnoremap <leader>fef :call Preserve("normal gg=G")<CR>
+nnoremap <leader>ev :split ~/.vim/vimrc<CR>
+nnoremap <leader>sv :source ~/.vimrc<CR>
+nnoremap <leader>h :noh<CR>
+nnoremap <leader>l :set list!<CR>
+nnoremap <silent> <C-S> :update<CR>
+vnoremap <silent> <C-S> <C-C>:update<CR>
+inoremap <silent> <C-S> <Esc>:update<CR>
+nnoremap <silent> <C-E> <C-E>j
+nnoremap <silent> <C-Y> <C-Y>k
+nnoremap <silent> <C-H> ^
+nnoremap <silent> <C-L> $
+
+" command-line window {{{
+  nnoremap q: q:i
+  nnoremap q/ q/i
+  nnoremap q? q?i
+" }}}
+
+" folds {{{
+  nnoremap zr zr:echo &foldlevel<cr>
+  nnoremap zm zm:echo &foldlevel<cr>
+  nnoremap zR zR:echo &foldlevel<cr>
+  nnoremap zM zM:echo &foldlevel<cr>
+" }}}
+
+" make Y consistent with C and D. See :help Y.
+nnoremap Y y$
+
+" hide annoying quit message
+nnoremap <C-c> <C-c>:echo<cr>
+
+" insert current date
+nnoremap <F6> "=strftime("%Y-%m-%d")<CR>P
+inoremap <F6> <C-R>=strftime("%Y-%m-%d")<CR>
+
+" abbreviations
+iab filed field
+iab thme theme
+iab resutl result
+
+" show syntax group
+  map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">" . " FG:" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"fg#")<CR>
+"}}}
 
 filetype plugin indent on
 syntax enable
