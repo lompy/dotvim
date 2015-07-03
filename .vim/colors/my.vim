@@ -3,7 +3,7 @@ highlight clear
 
 if exists("syntax_on")
   syntax reset
-endi
+endif
 
 hi Underlined ctermfg=NONE ctermbg=7 cterm=NONE guifg=NONE guibg=NONE gui=underline
 hi CursorLine ctermfg=NONE ctermbg=NONE cterm=NONE
