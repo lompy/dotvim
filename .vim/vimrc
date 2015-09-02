@@ -209,8 +209,9 @@ call matchadd('ColorColumn', '\%81v', 100)
   "}}}
   NeoBundleLazy 'groenewege/vim-less', {'autoload':{'filetypes':['less']}}
   NeoBundleLazy 'wavded/vim-stylus', {'autoload':{'filetypes':['styl']}}
+  NeoBundleLazy 'slim-template/vim-slim', {'autoload':{'filetypes':['slim']}}
   NeoBundleLazy 'gregsexton/MatchTag', {'autoload':{'filetypes':['html','xml']}}
-  NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty']}} "{{{
+  NeoBundleLazy 'mattn/emmet-vim', {'autoload':{'filetypes':['html','xml','xsl','xslt','xsd','css','sass','scss','less','mustache', 'tmpl','smarty', 'erb']}} "{{{
 "}}}
 
 " javascript {{{
@@ -239,6 +240,8 @@ call matchadd('ColorColumn', '\%81v', 100)
 " scm {{{
   NeoBundle 'tpope/vim-fugitive' "{{{
     nnoremap <silent> <leader>gb :Gblame<CR>
+    nnoremap <silent> <leader>gs :Gstatus<CR>
+    nnoremap <silent> <F7> :read !git rev-parse --abbrev-ref HEAD<CR>kddi[<ESC>A]<Space>
   "}}}
 "}}}
 
@@ -349,6 +352,7 @@ call matchadd('ColorColumn', '\%81v', 100)
     let g:syntastic_style_error_symbol = 'œ'
     let g:syntastic_warning_symbol = 'w'
     let g:syntastic_style_warning_symbol = '≈'
+    let g:syntastic_ruby_checkers=['rubocop', 'mri']
   "}}}
   NeoBundle 'malkomalko/projections.vim'
 "}}}
